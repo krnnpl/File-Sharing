@@ -10,21 +10,21 @@ router.get('/', (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-    const { name, email, phone, password, cpassword } = req.body;
-    if (!name || !email || !phone || !password || !cpassword) {
+    const { username, branch, password, cpassword,isAdmin } = req.body;
+    if (!username || !branch   || !password || !cpassword || !isAdmin) {
         return res.status(422).json({ error: "Fill the filed" });
     }
     try {
-        const userExist = await User.findOne({ email: email })
+        const userExist = await User.findOne({ username: username })
 
         if (userExist) {
-            return res.status(422).json({ error: "Email already Exist" });
+            return res.status(422).json({ error: "User already Exist" });
         }else if(password != cpassword){
             return res.status(422).json({ error: "Password is not Matching" });
 
 
         }else{
-            const user = new User({ name, email, phone, password, cpassword });
+            const user = new User({ username, branch, password, cpassword,isAdmin });
 
         const userRegister = await user.save()
         if (userRegister) {
@@ -52,24 +52,19 @@ router.post('/register', async (req, res) => {
 
 router.post('/signin',async(req,res)=>{
     try {
-        const {email, password}=req.body;
-        if(!email || !password) {
+        const {username, password}=req.body;
+        if(!username || !password) {
             return res.status(400).json({error:"Fill the data in all Field"})
         }
 
-        const userLogin= await User.findOne({email:email});
+        const userLogin= await User.findOne({username:username});
         
         //console.log(userLogin);
         if(userLogin){
             const isMatch = await bcrypt.compare(password, userLogin.password);
 
-            const token = await userLogin.generateAuthToken();
-            console.log(token);
-
-            res.cookie("jwtoken", token,{
-                expires:new Date(Date.now() + 3600000 ),
-                httpOnly:true
-            });
+            
+          
 
         if(!isMatch) {
             res.status(400).json({error: "Invalid Credientials"});

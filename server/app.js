@@ -7,6 +7,7 @@ dotenv.config({ path: './config.env' });
 
 require('./db/conn'); 
 const User = require('./model/userSchema');
+const File = require('./model/fileSchema');
 
 app.use(express.json());
 app.use(require('./router/auth'))
