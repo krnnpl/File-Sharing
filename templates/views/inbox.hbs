@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <title>FILE SHARING</title>
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    
+</head>
+
+<body>
+    {{>navbar}}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-10 col-12 mx-auto">
+                <h1>We are here to share</h1>
+                <h2>Share your files from this site with a secure and easy way within your working organization</h2>
+                {{#if messages}}
+                <ul>
+                    {{#each messages}}
+                    <li>
+                        <h3>{{subject}}</h3>
+                        <p>From: {{sender}}</p>
+                        <p>{{message}}</p>
+                        <ul>
+                            {{#each files}}
+                            <li>{{filename}} (Size: {{size}})</li>
+                            {{/each}}
+                        </ul>
+                    </li>
+                    {{/each}}
+                </ul>
+                {{else}}
+                <p class="no-messages">No messages in the inbox.</p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+
+
+<script src="../jq/jquery.js" type="text/javascript"></script>
+<script src="../js/bootstrap.js" type="text/javascript"></script>
+</body>
+
+</html>

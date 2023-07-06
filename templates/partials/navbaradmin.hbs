@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+            font-family: "Roboto", sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+        }
+    .bg-light {
+    --bs-bg-opacity: 1;
+    background-color: honeydew;
+    border-radius: 15px;
+}
+.py-3 {
+    padding-top: 1rem!important;
+    padding-bottom: 1rem!important;
+    background-color: cornflowerblue;
+}
+    .navbar-nav .nav-link {
+      position: relative;
+      color: #000;
+      text-decoration: none;
+      padding: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 2px;
+      background-color: transparent;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover:before {
+      background-color: #000;
+    }
+
+    
+  </style>
+</head>
+<body>
+  <div class="container-fluid navbar-style py-3">
+    <div class="row">
+      <div class="col-md-10 col-12 mx-auto">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="/" id="logo">File Sharing</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/admin_inbox">Inbox <span class="sr-only"></span></a>
+              </li>
+              
+              <li class="nav-item">
+                <a class="nav-link" href="/viewmembers">View User</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/adduser">Add User</a>
+              </li>
+              
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  
+</body>
+</html>

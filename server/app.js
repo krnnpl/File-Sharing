@@ -2,16 +2,49 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
+const path = require('path');
+const hbs = require("hbs");
+const { registerPartials } =require("hbs");
+const router = express.Router();
+
 
 dotenv.config({ path: './config.env' });
 
-require('./db/conn'); 
+require('./db/conn');
+
+//setting path
+//const staticpath = path.join(__dirname,"../public");
+const templatepath =path.join(__dirname,"../templates/views");
+const partialpath = path.join(__dirname, "../templates/partials");
+
+//middleware
+app.use('/css', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/css")));
+app.use('/js', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/js")));
+app.use('/jq', express.static(path.join(__dirname,"../node_modules/jquery/dist")));
+//app.use(express.static(staticpath))
+
+
+  
 const User = require('./model/userSchema');
 const File = require('./model/fileSchema');
 
+
 app.use(express.json());
-app.use(require('./router/auth'))
+app.use(require('./routers/auth'))
+
 const PORT = process.env.PORT;
+
+
+app.set('views', path.join(__dirname, '../templates/views'));
+app.set('view engine', 'hbs');
+app.set("views", templatepath);
+hbs.registerPartials(partialpath);
+
+
+// Routes 
+app.use('/api/files', require('./routes/files'));
+app.use('/files', require('./routes/show'));
+app.use('/files/download', require('./routes/download'));
 
 const middleware = (req, res, next) => {
     console.log('hello my middleware');
@@ -21,28 +54,31 @@ const middleware = (req, res, next) => {
 
 
 
-//app.get('/', (req, res) => {
-//res.send('Hello world from server')
+app.get('/', (req, res) => {
+res.render("inbox");
+});
 
-//});
-app.get('/about', middleware, (req, res) => {
-    console.log('Hello my middleware')
-    res.send('Hello about world from server')
 
-    app.get('/contact', (req, res) => {
-        res.send('Hello contact  world from server')
+
+
+    app.get('/compose', (req, res) => {
+        res.render("compose");
 
     });
 
-});
+    app.get('/sent', (req, res) => {
+        res.render("sent");
+
+    });
+
+
 app.get('/login', (req, res) => {
     res.send('Hello signin  world from server')
 
 });
-app.get('/register', (req, res) => {
-    res.send('Hello signup world from server')
+const adminRouter = require('./admin');
+app.use('/admin', adminRouter);
 
-});
 app.listen(PORT, () => {
     console.log(`server is running at port no ${PORT}`);
 })

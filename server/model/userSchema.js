@@ -21,12 +21,12 @@ const userSchema = new mongoose.Schema({
         required: true,
     },isAdmin: {
         type: Boolean,
-        required: true
+        required: false
     }
    
 
 });
-
+ 
 
 
 //hashing the password
