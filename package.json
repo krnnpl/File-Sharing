@@ -1,31 +1,21 @@
 {
-  "name": "file-sharing",
+  "name": "filesharing",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/krnnpl/File-Sharing.git"
-  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/krnnpl/File-Sharing/issues"
-  },
-  "homepage": "https://github.com/krnnpl/File-Sharing#readme",
   "dependencies": {
-    "archiver": "^5.3.1",
     "bcrypt": "^5.1.0",
-    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "ejs": "^3.1.9",
     "express": "^4.18.2",
-    "mongodb": "^5.6.0",
+    "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.3.1",
-    "multer": "^1.4.5-lts.1",
-    "uuid": "^9.0.0"
+    "moongoose": "^0.0.5",
+    "multer": "^1.4.5-lts.1"
   }
 }

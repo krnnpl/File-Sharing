@@ -1,43 +1,56 @@
-require('dotenv').config();
+// const express = require('express');
+// const bodyParser = require('body-parser');
+// const authRoutes = require('./routes/auth');
+
+// const app = express();
+// const PORT = 3000;
+
+// // Middleware
+// app.use(bodyParser.json());
+
+// // Connect to MongoDB
+// const connectDB = require('./config/db');
+// connectDB();
+
+
+// // Routes
+// app.use('/api/auth', authRoutes);
+
+// // Start the server
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
+
+
+
+
+
+
+
 const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-const path = require('path');
-const cors = require('cors');
-// Cors 
-const corsOptions = {
-  origin: process.env.ALLOWED_CLIENTS.split(',')
-  // ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:3300']
-}
-
-// Default configuration looks like
-// {
-//     "origin": "*",
-//     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-//     "preflightContinue": false,
-//     "optionsSuccessStatus": 204
-//   }
-
-app.use(cors(corsOptions))
-app.use(express.static('public'));
-
+const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
+const authRoutes = require('./routes/auth');
+const messageRoutes = require('./routes/message');
+
+const app = express();
+const PORT = 3000;
+const searchRoute = require('./routes/search');
+
+
+// Middleware
+app.use(bodyParser.json());
+
+// Connect to MongoDB
 connectDB();
 
-app.use(express.json());
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/search', searchRoute);
 
- app.set('views', path.join(__dirname, '/views'));
- app.set('view engine', 'ejs');
 
-// Routes 
-app.use('/api/files', require('./routes/files'));
-app.use('/files', require('./routes/show'));
-app.use('/files/download', require('./routes/download'));
-
-// //routes for users
-// app.use('/users',require('./routes/users'));
-
-// //authentication router
-// app.use('/auth',require('./routes/auth'));
-
-app.listen(PORT, console.log(`Listening on port ${PORT}.`));
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
