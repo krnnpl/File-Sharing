@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
     body {
-            font-family: "Roboto", sans-serif;
-            background-color: #f1f1f1;
-            margin: 0;
-            padding: 0;
-        }
+      font-family: "Roboto", sans-serif;
+      background-color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
     .bg-light {
-    --bs-bg-opacity: 1;
-    background-color: honeydew;
-    border-radius: 15px;
-}
-.py-3 {
-    padding-top: 1rem!important;
-    padding-bottom: 1rem!important;
-    background-color: cornflowerblue;
-}
+      --bs-bg-opacity: 1;
+      background-color: honeydew;
+      border-radius: 15px;
+      width: auto;
+    }
+
+    .py-3 {
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+      background-color: cornflowerblue;
+    }
+
     .navbar-nav .nav-link {
       position: relative;
       color: #000;
@@ -44,20 +49,22 @@
       background-color: #000;
     }
 
-    
+    .form-inline {
+      padding-
+    }
   </style>
 </head>
+
 <body>
   <div class="container-fluid navbar-style py-3">
     <div class="row">
       <div class="col-md-10 col-12 mx-auto">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="/" id="logo">File Sharing</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <a class="navbar-brand" id="logo">File Sharing</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="collapse navbar-collapse" id="navbarSupportedContent" style="padding-right: 30px;">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
                 <a class="nav-link" href="/inbox">Inbox <span class="sr-only"></span></a>
@@ -75,12 +82,18 @@
                 <a class="nav-link" href="/admin">Admin Panel</a>
               </li>
             </ul>
+            <form class="form-inline" style="padding-left:10px" ;>
+              <input class="form-control ml-sm-5" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success " type="submit">Search</button>
+            </form>
           </div>
+
+
         </nav>
       </div>
     </div>
   </div>
 
-  
 </body>
+
 </html>

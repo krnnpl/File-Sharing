@@ -36,6 +36,7 @@ const PORT = process.env.PORT;
 
 
 app.set('views', path.join(__dirname, '../templates/views'));
+app.set('views', path.join(__dirname, '../templates/views/admin'));
 app.set('view engine', 'hbs');
 app.set("views", templatepath);
 hbs.registerPartials(partialpath);
@@ -55,8 +56,12 @@ const middleware = (req, res, next) => {
 
 
 app.get('/', (req, res) => {
-res.render("inbox");
+res.render("login");
 });
+
+app.get('/inbox', (req, res) => {
+    res.render("inbox");
+    });
 
 
 
