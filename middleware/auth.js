@@ -32,15 +32,6 @@ const authenticate = async (req, res, next) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-// Middleware function to check if user is admin
-// const isAdmin = (req, res, next) => {
-  
-//   if (!isAdmin) {
-//     return res.status(403).json({ error: 'Access denied' });
-//   }
-
-//   next();
-// };
 
 // isAdmin middleware function
 const isAdmin = (req, res, next) => {
