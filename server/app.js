@@ -26,7 +26,7 @@ app.use('/jq', express.static(path.join(__dirname,"../node_modules/jquery/dist")
 
   
 const User = require('./model/userSchema');
-const File = require('./model/fileSchema');
+const Message = require('./model/messageSchema');
 
 
 app.use(express.json());
@@ -43,9 +43,9 @@ hbs.registerPartials(partialpath);
 
 
 // Routes 
-app.use('/api/files', require('./routes/files'));
-app.use('/files', require('./routes/show'));
-app.use('/files/download', require('./routes/download'));
+//app.use('/api/files', require('./routes/files'));
+//app.use('/files', require('./routes/show'));
+//app.use('/files/download', require('./routes/download'));
 
 
 

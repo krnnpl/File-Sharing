@@ -4,6 +4,8 @@ const router = express.Router();
 const bcrypt= require('bcryptjs');
 require('../db/conn');
 const User = require("../model/userSchema");
+const { authenticate, isAdmin } = require('../middleware/auth');
+const secretKey = process.env.SECRET_KEY;
 
 
 
