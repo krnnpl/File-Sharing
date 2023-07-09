@@ -12,7 +12,7 @@ const secretKey = process.env.SECRET_KEY; // Replace with your actual secret key
 // Register a new user (accessible only to authorized admin users)
 router.post('/register', authenticate, isAdmin, async (req, res) => {
   // Get the user information from the request body
-  const { username, password, branch } = req.body;
+  const { firstName,lastName,phoneNumber, username, password, branch } = req.body;
 
   try {
     // Check if the user already exists
@@ -22,7 +22,7 @@ router.post('/register', authenticate, isAdmin, async (req, res) => {
     }
 
     // Create a new user
-    const newUser = new User({ username, password, branch, isAdmin: false });
+    const newUser = new User({ firstName,lastName,phoneNumber,username, password, branch, isAdmin: false });
 
     // Save the user to the database
     const savedUser = await newUser.save();
@@ -120,5 +120,29 @@ router.delete('/users/:username', authenticate, isAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete user' });
   }
 });
+
+// Reset user password (accessible only to authorized admin users)
+router.post('/reset-password/:username', authenticate, isAdmin, async (req, res) => {
+  const { username } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    // Find the user by username
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update the user's password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
 
 module.exports = router;
