@@ -221,7 +221,7 @@
                 <h2>Sign In</h2>
                 <div class="form">
                     <div class="inputBox">
-                        <input type="text" required>
+                        <input type="text" id="username" required>
                         <label>Username</label>
                     </div>
                     <div class="inputBox">
@@ -237,6 +237,8 @@
                 </div>
             </div>
         </div>
+        <p id="error-message" style="color: red; display: none;"></p>
+
     </section>
     <footer>
         <p>&copy; 2023 Swifty Share. All rights reserved. | <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
@@ -246,3 +248,40 @@
 </body>
 
 </html>
+<script>
+  // Handle form submission
+  document.getElementById('signin').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('passwordInput').value;
+
+    // Make API request to authenticate admin
+    try {
+      const response = await fetch('/api/auth/admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        // Admin authenticated successfully
+        // Save access token in cookies
+        document.cookie = `accessToken=${data.accessToken}; path=/`;
+        
+        // Redirect to admin homepage
+        window.location.href = '/admin/inbox';
+      } else {
+        // Invalid password for admin
+        document.getElementById('error-message').textContent = 'Invalid username or password';
+        document.getElementById('error-message').style.display = 'block';
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  });
+</script>
