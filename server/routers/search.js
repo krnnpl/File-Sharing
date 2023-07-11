@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
-const Message = require('../models/messageSchema');
-const User = require('../models/userSchema');
+const Message = require('../model/messageSchema');
+const User = require('../model/userSchema');
 
 // Perform search in authorized user's inbox and outbox
 router.get('/', authenticate, async (req, res) => {

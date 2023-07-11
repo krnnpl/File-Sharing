@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt= require('bcryptjs');
 require('../db/conn');
+require('dotenv').config();
 const User = require("../model/userSchema");
 const { authenticate, isAdmin } = require('../middleware/auth');
 const secretKey = process.env.SECRET_KEY;
@@ -49,6 +50,7 @@ router.post('/register', authenticate, isAdmin, async (req, res) => {
     
 });
 
+//user signin
 router.post('/signin',async(req,res)=>{
     try {
         const {username, password}=req.body;

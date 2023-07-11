@@ -75,6 +75,7 @@
     section .signin {
       position: absolute;
       width: 400px;
+      height: 450px;
       background: #222;
       z-index: 1000;
       display: flex;
@@ -111,6 +112,7 @@
     section .signin .content .form .inputBox {
       position: relative;
       width: 100%;
+      margin-bottom: 20px;
     }
 
     section .signin .content .form .inputBox input {
@@ -157,8 +159,8 @@
     .signin .content .form .inputBox input:focus~label,
     .signin .content .form .inputBox input:valid~label {
       transform: translateY(-30px);
-      font-size: 0.8em;
-      color: #fff;
+      font-size: 1.1em;
+      color: #0e0d0d;
     }
 
     .signin .content .form .links {
@@ -181,10 +183,16 @@
       font-size: 1.35em;
       letter-spacing: 0.05em;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     input[type="submit"]:active {
       opacity: 0.6;
+    }
+    #error-message{
+      float: right;
+      border-style:dotted ;
+      
     }
 
     @media (max-width: 900px) {
@@ -204,34 +212,114 @@
 </head>
 
 <body>
-  <section> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> 
-
-
+ <section> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span>
+    <span></span> <span></span> <span></span> <span></span> <span></span>
     <div class="signin">
       <div class="content">
-        <h2>Sign In</h2>
-        <div class="form">
+        <h2>Admin Login</h2>
+        <div class="form" >
+          <form class="loginform" id="form1">
           <div class="inputBox">
-            <input type="text" required>
+            <input type="text"  id="username" required>
             <label>Username</label>
           </div>
           <div class="inputBox">
-            <input type="password" required>
+            <input type="password" id="password" required>
             <label>Password</label>
           </div>
-          <div class="inputBox">
-            <input type="checkbox" id="remember" name="remember">
-            <label for="remember">Remember Me</label>
-          </div>
+          
+            
+         
+          
+        
           <div class="inputBox">
             <input type="submit" value="Login">
           </div>
+          
+          <p id="error-message" style="color: red; display: none;"></p>
+          </div>
+          </form>
         </div>
       </div>
     </div>
   </section>
 
   <script src="../jq/jquery.js" type="text/javascript"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Handle form submission
+      document.getElementById('form1').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Make API request to authenticate admin
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await response.json();
+
+          if (response.status === 200) {
+            // Admin authenticated successfully
+            // Save access token in cookies
+            document.cookie = `accessToken=${data.accessToken}; path=/`;
+
+            // Redirect to admin homepage
+            window.location.href = '/admin/inbox';
+          } else {
+            // Invalid password for admin
+            document.getElementById('error-message').textContent = ' Invalid username or password';
+            document.getElementById('error-message').style.display = 'block';
+          // Set a timeout to hide the error message after 3 seconds
+        setTimeout(() => {
+          document.getElementById('error-message').style.display = 'none';
+        }, 3000);
+      }
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    });
+  </script>
+
 </body>
 
 </html>

@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const Message = require('../models/messageSchema');
-const User = require('../models/userSchema');
+const Message = require('../model/messageSchema');
+const User = require('../model/userSchema');
 const { authenticate } = require('../middleware/auth');
 
 // Multer configuration

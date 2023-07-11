@@ -92,7 +92,7 @@
 
   <div class="container">
     <h2>User Registration</h2>
-    <form action="/register" method="POST">
+    <form id="registrationForm" action="/register" method="POST">
       <div class="form-group">
         <label for="firstName">First Name:</label>
         <input type="text" id="firstName" name="firstName" required>
@@ -103,7 +103,7 @@
       </div>
       <div class="form-group">
         <label for="phone">Phone Number:</label>
-        <input type="tel" id="phone" name="phone" required>
+        <input type="tel" id="phone" name="phoneNumber" required>
       </div>
       <div class="form-group">
         <label for="username">Username:</label>
@@ -127,9 +127,11 @@
         <label for="branch">Branch:</label>
         <select id="branch" name="branch" required>
           <option value="">Select Branch</option>
-          <option value="branch1">Branch 1</option>
-          <option value="branch2">Branch 2</option>
-          <option value="branch3">Branch 3</option>
+          <option value="branch1">Itahari Branch </option>
+          <option value="branch2">Tarahara Branch </option>
+          <option value="branch3">Ramdhuni Branch </option>
+          <option value="branch3">Bahrachhetra Branch </option>
+          <option value="branch3">Mahendranagar Branch </option>
         </select>
       </div>
       <div class="form-group">
@@ -157,6 +159,46 @@
           }
         });
       });
+      var registrationForm = document.getElementById("registrationForm");
+    registrationForm.addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Get form data
+      var firstName = document.getElementById("firstName").value;
+      var lastName = document.getElementById("lastName").value;
+      var phone = document.getElementById("phone").value;
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+      var confirmPassword = document.getElementById("confirmPassword").value;
+      var branch = document.getElementById("branch").value;
+
+      // Create request body
+      var requestBody = {
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phone,
+        username: username,
+        password: password,
+        confirmPassword: confirmPassword,
+        branch: branch
+      };
+
+      // Send AJAX request
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://localhost:3000/api/auth/register");
+      xhr.setRequestHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NGFiYTRmMGM5ZTljNjljZjVhNDdkYTkiLCJpYXQiOjE2ODg5NzI0MzQsImV4cCI6MTY4ODk3NjAzNH0.bvaIB_1PG8f-6WgQbrKb_4Qr4Tx8uHhH-RhZ81LSWMQ");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onload = function () {
+        if (xhr.status === 201) {
+          var response = JSON.parse(xhr.responseText);
+          alert(response.message); // Show success message
+          registrationForm.reset(); // Reset the form
+        } else {
+          alert("Registration failed. Please try again.");
+        }
+      };
+      xhr.send(JSON.stringify(requestBody));
+    });
     });
   </script>
 </body>

@@ -1,11 +1,15 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const express = require('express');
+const bodyParser=require('body-parser');
 const app = express();
 const path = require('path');
 const hbs = require("hbs");
 const { registerPartials } =require("hbs");
 const router = express.Router();
+const authRoutes = require('./routers/auth');
+const messageRoutes = require('./routers/message');
+const searchRoutes = require('./routers/search');
 
 
 dotenv.config({ path: './config.env' });
@@ -18,6 +22,7 @@ const templatepath =path.join(__dirname,"../templates/views");
 const partialpath = path.join(__dirname, "../templates/partials");
 
 //middleware
+app.use(bodyParser.json());
 app.use('/css', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/css")));
 app.use('/js', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/js")));
 app.use('/jq', express.static(path.join(__dirname,"../node_modules/jquery/dist")));
@@ -33,6 +38,11 @@ app.use(express.json());
 app.use(require('./routers/auth'))
 
 const PORT = process.env.PORT;
+app.use('/api/auth', authRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/search', searchRoutes);
+
+
 
 
 app.set('views', path.join(__dirname, '../templates/views'));

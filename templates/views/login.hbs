@@ -26,19 +26,20 @@
         section {
             position: fixed;
             width: 100vw;
-            height: 100vh;
+            height: 80vh;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 2px;
             flex-wrap: wrap;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 80px;
         }
 
         section .signin {
             position: absolute;
             width: 400px;
+            height: 450px;
             background: #222;
             z-index: 1000;
             display: flex;
@@ -69,12 +70,14 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 30px;
         }
 
         section .signin .content .form .inputBox {
             position: relative;
             width: 100%;
+            margin: 25px;
+            margin-left: 5px;
         }
 
         section .signin .content .form .inputBox input {
@@ -121,8 +124,8 @@
         .signin .content .form .inputBox input:focus~label,
         .signin .content .form .inputBox input:valid~label {
             transform: translateY(-30px);
-            font-size: 0.8em;
-            color: #fff;
+            font-size: 1em;
+            color: #070707;
         }
 
         .signin .content .form .inputBox i {
@@ -220,12 +223,13 @@
             <div class="content">
                 <h2>Sign In</h2>
                 <div class="form">
+                    <form id="login">
                     <div class="inputBox">
                         <input type="text" id="username" required>
                         <label>Username</label>
                     </div>
                     <div class="inputBox">
-                        <input type="password" id="passwordInput" required>
+                        <input type="password" id="password" required>
                         <label>Password</label>
                     </div>
                     <div class="inputBo">
@@ -234,54 +238,61 @@
                     <div class="inputBox">
                         <input type="submit" value="Login">
                     </div>
+                    <p id="error-message" style="color: red; display: none;"></p>
+                    </form>
                 </div>
             </div>
         </div>
-        <p id="error-message" style="color: red; display: none;"></p>
-
+        
     </section>
     <footer>
         <p>&copy; 2023 Swifty Share. All rights reserved. | <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
     </footer>
     <script src="../jq/jquery.js" type="text/javascript"></script>
     <script src="../js/bootstrap.js" type="text/javascript"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Handle form submission
+      document.getElementById('login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Make API request to authenticate admin
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/signin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await response.json();
+
+          if (response.status === 200) {
+            // Admin authenticated successfully
+            // Save access token in cookies
+            document.cookie = `accessToken=${data.accessToken}; path=/`;
+
+            // Redirect to user homepage
+            window.location.href = '/inbox';
+          } else {
+            // Invalid password for admin
+            document.getElementById('error-message').textContent = ' Invalid Credentials';
+            document.getElementById('error-message').style.display = 'block';
+          // Set a timeout to hide the error message after 3 seconds
+        setTimeout(() => {
+          document.getElementById('error-message').style.display = 'none';
+        }, 3000);
+      }
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
-<script>
-  // Handle form submission
-  document.getElementById('signin').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('passwordInput').value;
-
-    // Make API request to authenticate admin
-    try {
-      const response = await fetch('/api/auth/admin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await response.json();
-
-      if (response.status === 200) {
-        // Admin authenticated successfully
-        // Save access token in cookies
-        document.cookie = `accessToken=${data.accessToken}; path=/`;
-        
-        // Redirect to admin homepage
-        window.location.href = '/admin/inbox';
-      } else {
-        // Invalid password for admin
-        document.getElementById('error-message').textContent = 'Invalid username or password';
-        document.getElementById('error-message').style.display = 'block';
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  });
-</script>
