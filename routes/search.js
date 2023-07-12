@@ -63,13 +63,10 @@ router.get('/', authenticate, async (req, res) => {
       {
         $or: [
           { username: { $regex: query, $options: 'i' } },
-          { firstName: { $regex: query, $options: 'i' } },
-          { lastName: { $regex: query, $options: 'i' } },
-          { phoneNumber: { $regex: query, $options: 'i' } },
           { branch: { $regex: query, $options: 'i' } }
         ]
       },
-      { username: 1,firstName, lastName, phoneNumber, branch: 1 }
+      { username: 1, branch: 1 }
     );
 
     res.json({ messages, users });

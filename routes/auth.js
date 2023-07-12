@@ -1,8 +1,13 @@
+
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/userSchema');
 const jwt = require('jsonwebtoken');
-const { authenticate, isAdmin } = require('../middleware/auth');
+const { authenticate, authenticateUser, isAdmin } = require('../middleware/auth');
 require('dotenv').config();
 
 // Define the secret key for signing the access token
@@ -10,7 +15,7 @@ const secretKey = process.env.SECRET_KEY; // Replace with your actual secret key
 
 
 // Register a new user (accessible only to authorized admin users)
-router.post('/register', authenticate, isAdmin, async (req, res) => {
+router.post('/register', authenticateUser, isAdmin, async (req, res) => {
   // Get the user information from the request body
   const { firstName,lastName,phoneNumber, username, password, branch } = req.body;
 
@@ -70,6 +75,37 @@ router.post('/login', async (req, res) => {
 });
 
 // Admin login
+// router.post('/admin/login', async (req, res) => {
+//   const { username, password } = req.body;
+
+//   try {
+//     // Find the admin user by username
+//     const admin = await User.findOne({ username, isAdmin: true });
+
+//     // Check if the admin user exists
+//     if (!admin) {
+//       return res.status(401).json({ error: 'Admin user not found' });
+//     }
+
+//     // Compare the entered password with the stored hash
+//     const isMatch = await admin.comparePassword(password);
+
+//     // Check if the password matches
+//     if (!isMatch) {
+//       return res.status(401).json({ error: 'Invalid password for admin' });
+//     }
+
+//     // Generate access token
+//     const accessToken = jwt.sign({ userId: admin._id }, secretKey, { expiresIn: '1h' });
+
+//     // Admin authenticated successfully
+//     res.json({ message: 'Admin authenticated successfully', accessToken });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Failed to authenticate admin' });
+//   }
+// });
+// Admin login
 router.post('/admin/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -93,8 +129,13 @@ router.post('/admin/login', async (req, res) => {
     // Generate access token
     const accessToken = jwt.sign({ userId: admin._id }, secretKey, { expiresIn: '1h' });
 
+    // Store the access token in the session or a cookie
+    req.session.accessToken = accessToken;
+    // Set the access token as an HTTP-only cookie
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+
     // Admin authenticated successfully
-    res.json({ message: 'Admin authenticated successfully', accessToken });
+    res.json({ message: 'Admin authenticated successfully'});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to authenticate admin' });
@@ -102,8 +143,9 @@ router.post('/admin/login', async (req, res) => {
 });
 
 
+
 // Delete a user by username (admin only)
-router.delete('/users/:username', authenticate, isAdmin, async (req, res) => {
+router.delete('/users/:username', authenticateUser, isAdmin, async (req, res) => {
   const { username } = req.params;
 
   try {
@@ -120,9 +162,10 @@ router.delete('/users/:username', authenticate, isAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete user' });
   }
 });
-
+//get all users (accessible only to authorized admin)
+router.get
 // Reset user password (accessible only to authorized admin users)
-router.post('/reset-password/:username', authenticate, isAdmin, async (req, res) => {
+router.post('/reset-password/:username', authenticateUser, isAdmin, async (req, res) => {
   const { username } = req.params;
   const { newPassword } = req.body;
 
@@ -144,5 +187,17 @@ router.post('/reset-password/:username', authenticate, isAdmin, async (req, res)
   }
 });
 
+// Get all users (accessible only to authorized admin)
+router.get('/users', authenticateUser, isAdmin, async (req, res) => {
+  try {
+    // Retrieve all users from the database
+    const users = await User.find({}, '-isAdmin -password -_id -__v');
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
 
 module.exports = router;

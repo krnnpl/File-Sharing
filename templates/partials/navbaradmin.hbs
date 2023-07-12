@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      background-color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar-style {
+      background-color: cornflowerblue;
+      border-radius: 15px;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .navbar-style .navbar-brand {
+      color: #000;
+      font-weight: bold;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    .navbar-style .navbar-toggler {
+      border: none;
+      background-color: transparent;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .navbar-style .navbar-toggler:focus,
+    .navbar-style .navbar-toggler:active {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .navbar-style .navbar-nav .nav-item {
+      margin-left: 1rem;
+    }
+
+    .navbar-style .navbar-nav .nav-link {
+      color: #000;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-style .navbar-nav .nav-link:hover {
+      color: #fff;
+    }
+
+    .search-container {
+      float: right;
+    }
+
+    .search-container input[type=text] {
+      padding: 6px;
+      margin-top: 5px;
+      font-size: 15px;
+      border: solid 1px;
+    }
+
+    .search-container button {
+      float: right;
+      padding: 6px 10px;
+      margin-top: 5px;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+    }
+
+    .search-container button:hover {
+      background: #ccc;
+    }
+
+    @media screen and (max-width: 576px) {
+      .navbar-style .navbar-nav .nav-item {
+        margin-left: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid navbar-style">
+    <div class="row">
+      <div class="col-12">
+        <nav class="navbar navbar-expand-lg">
+          <a class="navbar-brand" id="logo" href="#">Swifty Share</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/inbox">All Incoming</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/users">View Users</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/register">Add User</a>
+              </li>
+            </ul>
+            <div class="search-container">
+              <form action="/action">
+                <input type="text" placeholder="Search.." name="search">
+                <button type="submit"><i class="fa fa-search"></i></button>
+              </form>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
