@@ -2,55 +2,112 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <title>FILE SHARING</title>
-    <style>
-        body {
-            font-family: "Roboto", sans-serif;
-            background-color: #f1f1f1;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
-    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Messages</title>
+  <link rel="stylesheet" href="../css/bootstrap.min.css">
 </head>
 
 <body>
-    {{>navbaradmin}}
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-10 col-12 mx-auto">
-                <h1>Admin</h1>
-                <h2>Share your files from this site with a secure and easy way within your working organization</h2>
-                {{#if messages}}
-                <ul>
-                    {{#each messages}}
-                    <li>
-                        <h3>{{subject}}</h3>
-                        <p>From: {{sender}}</p>
-                        <p>{{message}}</p>
-                        <ul>
-                            {{#each files}}
-                            <li>{{filename}} (Size: {{size}})</li>
-                            {{/each}}
-                        </ul>
-                    </li>
-                    {{/each}}
-                </ul>
-                {{else}}
-                <p class="no-messages">No messages in the inbox.</p>
-                {{/if}}
-            </div>
-        </div>
-    </div>
+  {{> navbaradmin}}
 
+  <div class="container">
+    <h2>All Messages</h2>
+    <table id="messagesTable" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Sender</th>
+          <th>Receivers</th>
+          <th>Subject</th>
+          <th>Attachments</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Message data will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
 
+  <script src="../jq/jquery.js" type="text/javascript"></script>
+  <script>
+  // Function to fetch all messages from the server and populate the table
+  function fetchMessages() {
+    // Get the access token from the cookie
+    var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
 
-<script src="../jq/jquery.js" type="text/javascript"></script>
-<script src="../js/bootstrap.js" type="text/javascript"></script>
+    // Send a GET request to retrieve all messages
+    fetch('/api/messages/allMessages', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken // Replace with the actual access token
+      }
+    })
+      .then(response => response.json())
+      .then(messages => {
+        // Clear the table body
+        const tableBody = document.querySelector('#messagesTable tbody');
+        tableBody.innerHTML = '';
+
+        // Populate the table with message data
+        messages.forEach(message => {
+          const row = document.createElement('tr');
+          const receivers = message.receivers.join(', ');
+          const attachments = message.attachments.map(attachment => `<a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a>`).join('<br>');
+
+          row.innerHTML = `
+            <td>${message.sender}</td>
+            <td>${receivers}</td>
+            <td>${message.subject}</td>
+            <td>${attachments}</td>
+            <td>${new Date(message.createdAt).toLocaleString()}</td>
+          `;
+          row.addEventListener('click', () => {
+            openMessageWindow(message);
+          });
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Failed to fetch messages.');
+      });
+  }
+
+  // Function to open the message in a new window
+  function openMessageWindow(message) {
+    const messageWindow = window.open('', '_blank');
+    const messageHTML = `
+      <html>
+        <head>
+          <title>Message: ${message.subject}</title>
+          <link rel="stylesheet" href="../css/bootstrap.min.css">
+        </head>
+        <body>
+          <div class="container">
+            <h2>${message.subject}</h2>
+            <p><strong>Sender:</strong> ${message.sender}</p>
+            <p><strong>Receivers:</strong> ${message.receivers.join(', ')}</p>
+            <p><strong>Date:</strong> ${new Date(message.createdAt).toLocaleString()}</p>
+            <p><strong>Attachments:</strong></p>
+            <ul>
+              ${message.attachments.map(attachment => `<li><a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a></li>`).join('')}
+            </ul>
+            <p><strong>Body:</strong></p>
+            <p>${message.body}</p>
+          </div>
+        </body>
+      </html>
+    `;
+    messageWindow.document.write(messageHTML);
+    messageWindow.document.close();
+  }
+
+  // Call the fetchMessages function when the page is loaded
+  document.addEventListener('DOMContentLoaded', fetchMessages);
+</script>
+
 </body>
 
 </html>
