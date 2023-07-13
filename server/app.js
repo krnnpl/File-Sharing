@@ -2,6 +2,8 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser=require('body-parser');
+const session= require('express-session');
+const cookieParser = require('cookie-parser');
 const app = express();
 const path = require('path');
 const hbs = require("hbs");
@@ -13,8 +15,11 @@ const searchRoutes = require('./routers/search');
 
 
 dotenv.config({ path: './config.env' });
+require('dotenv').config();
 
 require('./db/conn');
+
+const secretKey= process.env.SECRET_KEY
 
 //setting path
 //const staticpath = path.join(__dirname,"../public");
@@ -23,6 +28,14 @@ const partialpath = path.join(__dirname, "../templates/partials");
 
 //middleware
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(
+    session({
+        secret:secretKey,
+        resave: false,
+        saveUninitialized: false,
+    })
+);
 app.use('/css', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/css")));
 app.use('/js', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/js")));
 app.use('/jq', express.static(path.join(__dirname,"../node_modules/jquery/dist")));

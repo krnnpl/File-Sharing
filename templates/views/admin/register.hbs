@@ -127,11 +127,11 @@
         <label for="branch">Branch:</label>
         <select id="branch" name="branch" required>
           <option value="">Select Branch</option>
-          <option value="branch1">Itahari Branch </option>
-          <option value="branch2">Tarahara Branch </option>
-          <option value="branch3">Ramdhuni Branch </option>
-          <option value="branch3">Bahrachhetra Branch </option>
-          <option value="branch3">Mahendranagar Branch </option>
+          <option value="Itahari">Itahari Branch </option>
+          <option value="Tarahara">Tarahara Branch </option>
+          <option value="Ramdhuni">Ramdhuni Branch </option>
+          <option value="Bahrachhetra">Bahrachhetra Branch </option>
+          <option value="Mahendranagar">Mahendranagar Branch </option>
         </select>
       </div>
       <div class="form-group">
@@ -141,66 +141,84 @@
   </div>
 
   <script src="../jq/jquery.js" type="text/javascript"></script>
-  <script src="../js/bootstrap.js" type="text/javascript"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var toggleIcons = document.querySelectorAll(".toggle-icon");
-      toggleIcons.forEach(function (icon) {
-        icon.addEventListener("click", function () {
-          var inputField = this.previousElementSibling;
-          if (inputField.type === "password") {
-            inputField.type = "text";
-            this.classList.remove("fa-eye-slash");
-            this.classList.add("fa-eye");
-          } else {
-            inputField.type = "password";
-            this.classList.remove("fa-eye");
-            this.classList.add("fa-eye-slash");
-          }
-        });
-      });
-      var registrationForm = document.getElementById("registrationForm");
-    registrationForm.addEventListener("submit", function (event) {
-      event.preventDefault(); // Prevent form submission
-
-      // Get form data
-      var firstName = document.getElementById("firstName").value;
-      var lastName = document.getElementById("lastName").value;
-      var phone = document.getElementById("phone").value;
-      var username = document.getElementById("username").value;
-      var password = document.getElementById("password").value;
-      var confirmPassword = document.getElementById("confirmPassword").value;
-      var branch = document.getElementById("branch").value;
-
-      // Create request body
-      var requestBody = {
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phone,
-        username: username,
-        password: password,
-        confirmPassword: confirmPassword,
-        branch: branch
-      };
-
-      // Send AJAX request
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "http://localhost:3000/api/auth/register");
-      xhr.setRequestHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NGFiYTRmMGM5ZTljNjljZjVhNDdkYTkiLCJpYXQiOjE2ODg5NzI0MzQsImV4cCI6MTY4ODk3NjAzNH0.bvaIB_1PG8f-6WgQbrKb_4Qr4Tx8uHhH-RhZ81LSWMQ");
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onload = function () {
-        if (xhr.status === 201) {
-          var response = JSON.parse(xhr.responseText);
-          alert(response.message); // Show success message
-          registrationForm.reset(); // Reset the form
-        } else {
-          alert("Registration failed. Please try again.");
-        }
-      };
-      xhr.send(JSON.stringify(requestBody));
+  document.addEventListener("DOMContentLoaded", function () {
+  var toggleIcons = document.querySelectorAll(".toggle-icon");
+  toggleIcons.forEach(function (icon) {
+    icon.addEventListener("click", function () {
+      var inputField = this.previousElementSibling;
+      if (inputField.type === "password") {
+        inputField.type = "text";
+        this.classList.remove("fa-eye-slash");
+        this.classList.add("fa-eye");
+      } else {
+        inputField.type = "password";
+        this.classList.remove("fa-eye");
+        this.classList.add("fa-eye-slash");
+      }
     });
-    });
-  </script>
+  });
+  
+  var registrationForm = document.getElementById("registrationForm");
+  registrationForm.addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get form data
+    var firstName = document.getElementById("firstName").value;
+    var lastName = document.getElementById("lastName").value;
+    var phone = document.getElementById("phone").value;
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+    var branch = document.getElementById("branch").value;
+
+    // Check if password and confirmPassword match
+    if (password !== confirmPassword) {
+      alert("Passwords do not match. Please try again.");
+      return;
+    }
+
+    // Create request body
+    var requestBody = {
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phone,
+      username: username,
+      password: password,
+      confirmPassword: confirmPassword,
+      branch: branch
+    };
+
+    // Send AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:3000/api/auth/register");
+    // Get the access token from the cookie
+    var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
+
+    // Set the access token in the request header
+    xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onload = function () {
+      if (xhr.status === 201) {
+        var response = JSON.parse(xhr.responseText);
+        alert(response.message); // Show success message
+        registrationForm.reset(); // Reset the form
+      } else if (xhr.status === 422) {
+        var response = JSON.parse(xhr.responseText);
+        alert(response.error); // Show the specific error message
+      } else {
+        alert("Registration failed. Please try again.");
+      }
+    };
+    xhr.onerror = function () {
+      alert("Failed to register user. Please try again.");
+    };
+    xhr.send(JSON.stringify(requestBody));
+  });
+});
+
+</script>
+
 </body>
 
 </html>

@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const Message = require('../model/messageSchema');
 const User = require('../model/userSchema');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authenticateUser, isAdmin } = require('../middleware/auth');
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -61,7 +61,7 @@ router.post('/', authenticate, upload.array('attachments'), async (req, res) => 
 });
 
 // Get all messages
-router.get('/', async (req, res) => {
+router.get('/allMessages',authenticateUser, isAdmin, async (req, res) => {
   try {
     const messages = await Message.find();
     res.json(messages);
@@ -70,7 +70,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve messages' });
   }
 });
-
 // Download attachment
 router.get('/attachments/:filename', (req, res) => {
   const { filename } = req.params;
