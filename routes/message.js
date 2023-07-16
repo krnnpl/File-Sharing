@@ -114,23 +114,17 @@ router.get('/outbox', authenticateUser, async (req, res) => {
   });
 
   // Delete a message
-router.delete('/messages/:id', authenticateUser, isAdmin, async (req, res) => {
-  const messageId = req.params.id;
+router.delete('/delete/:id', authenticateUser, isAdmin, async (req, res) => {
+  const _id = req.params.id;
+  console.log(_id);
+      try {
+      const result = await Message.deleteOne({ _id });
+      
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
 
-  try {
-    // Find the message by ID
-    const message = await Message.findById(messageId);
-    if (!message) {
-      return res.status(404).json({ error: 'Message not found' });
-    }
-
-    // Perform authorization checks if required
-    // For example, you can check if the authenticated user is an admin and has the authority to delete the message
-
-    // Delete the message
-    await message.remove();
-
-    res.json({ message: 'Message deleted successfully' });
+      res.json({ message: 'Message deleted successfully' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to delete message' });
