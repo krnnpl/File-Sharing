@@ -5,6 +5,7 @@ const path = require('path');
 const Message = require('../models/messageSchema');
 const User = require('../models/userSchema');
 const { authenticate,authenticateUser, isAdmin } = require('../middleware/auth');
+const fs = require('fs');
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -113,23 +114,63 @@ router.get('/outbox', authenticateUser, async (req, res) => {
     }
   });
 
-  // Delete a message
-router.delete('/delete/:id', authenticateUser, isAdmin, async (req, res) => {
-  const _id = req.params.id;
-  console.log(_id);
-      try {
-      const result = await Message.deleteOne({ _id });
+//   // Delete a message
+// router.delete('/delete/:id', authenticateUser, isAdmin, async (req, res) => {
+//   const _id = req.params.id;
+//   console.log(_id);
+//       try {
+//       const result = await Message.deleteOne({ _id });
       
-      if (result.deletedCount === 0) {
-        return res.status(404).json({ error: 'Message not found' });
-      }
+//       if (result.deletedCount === 0) {
+//         return res.status(404).json({ error: 'Message not found' });
+//       }
 
-      res.json({ message: 'Message deleted successfully' });
+//       res.json({ message: 'Message deleted successfully' });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Failed to delete message' });
+//   }
+// });
+
+// Delete a message and its attached files
+// Delete a message and its attached files
+router.delete('/delete/:id', authenticateUser, isAdmin, async (req, res) => {
+  const messageId = req.params.id;
+
+  try {
+    // Find the message by ID
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Delete the attached files
+    message.attachments.forEach(attachment => {
+      const filePath = path.join(__dirname, '..', 'uploads', path.basename(attachment.path));
+
+      // Check if the file exists
+      if (fs.existsSync(filePath)) {
+        // Delete the file
+        fs.unlinkSync(filePath);
+      }
+    });
+
+    // Delete the message
+    const result = await Message.deleteOne({ _id: messageId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    res.json({ message: 'Message and attached files deleted successfully' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to delete message' });
   }
 });
+
+
 
 // Authorization middleware to check if the user is an admin
 const authorizeAdmin = (req, res, next) => {
