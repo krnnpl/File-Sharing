@@ -42,6 +42,7 @@
                             <th>Sender</th>
                             <th>Subject</th>
                             <th>Attachments</th>
+                             
                         </tr>
                     </thead>
                     <tbody>
@@ -63,11 +64,7 @@
                     </button>
                 </div>
                 <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <button class="btn btn-link forward-button">
-                        <i class="fas fa-forward"></i>
-                    </button>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -107,6 +104,9 @@
                             <td>${message.sender}</td>
                             <td>${message.subject}</td>
                             <td>${attachments}</td>
+                            <td>
+                                 <i class="fas fa-trash-alt delete-icon" data-message-id="${message.id}"></i>
+                            </td>
                         `;
 
                         row.addEventListener('click', () => {
@@ -115,6 +115,7 @@
 
                         tableBody.appendChild(row);
                     });
+            
                 })
                 .catch(error => {
                     console.error(error);
@@ -195,37 +196,31 @@
             // Populate the modal with message data
             modalTitle.innerText = message.subject || ''; // Add a default empty string if subject is undefined
             modalBody.innerHTML = `
+            <p><strong>Date:</strong> ${new Date(message.createdAt).toLocaleString()}</p> 
                 <p><strong>Sender:</strong> ${message.sender}</p>
                 <p><strong>Receivers:</strong> ${message.receivers.join(', ')}</p>
-                <p><strong>Date:</strong> ${new Date(message.createdAt).toLocaleString()}</p> 
                 <p><strong>Body:</strong></p>
                 <p>${message.body}</p>
                 <p><strong>Attachments:</strong></p>
-                <ul>
-                    ${message.attachments.map(attachment => `<li><a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a></li>`).join('')}
-                </ul>
+                 <ul>
+          ${message.attachments
+            .map(attachment => {
+              const extension = attachment.filename.split('.').pop().toLowerCase();
+              const iconURL = getIconURL(extension);
+              return `<li><img src="${iconURL}" alt="${extension.toUpperCase()}"> <a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a></li>`;
+            })
+            .join('')}
+        </ul>
             `;
 
-            // Add click event listener to the forward button
-            forwardButton.addEventListener('click', () => {
-                forwardMessage(message);
-            });
+           
 
             // Show the modal
             modal.classList.add('show');
             modal.style.display = 'block';
         }
 
-        // Function to forward a message
-        function forwardMessage(message) {
-            // Replace this with your logic to forward the message
-            const forwardRecipients = prompt('Enter recipients separated by commas:');
-            if (forwardRecipients !== null) {
-                // Perform the forwarding operation
-                console.log('Forwarding message:', message);
-                console.log('Recipients:', forwardRecipients);
-            }
-        }
+        
 
         // Call the fetchMessages function when the page is loaded
         document.addEventListener('DOMContentLoaded', function () {

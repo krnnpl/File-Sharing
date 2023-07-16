@@ -53,7 +53,7 @@
                             <th>Receivers</th>
                             <th>Subject</th>
                             <th>Attachments</th>
-                            <th>Delete</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -217,15 +217,21 @@
             // Populate the modal with message data
             modalTitle.innerText = message.subject || ''; // Add a default empty string if subject is undefined
             modalBody.innerHTML = `
+            <p><strong>Date:</strong> ${new Date(message.createdAt).toLocaleString()}</p> 
                 <p><strong>Sender:</strong> ${message.sender}</p>
                 <p><strong>Receivers:</strong> ${message.receivers.join(', ')}</p>
-                <p><strong>Date:</strong> ${new Date(message.createdAt).toLocaleString()}</p> 
                 <p><strong>Body:</strong></p>
                 <p>${message.body}</p>
                 <p><strong>Attachments:</strong></p>
                 <ul>
-                    ${message.attachments.map(attachment => `<li><a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a></li>`).join('')}
-                </ul>
+          ${message.attachments
+            .map(attachment => {
+              const extension = attachment.filename.split('.').pop().toLowerCase();
+              const iconURL = getIconURL(extension);
+              return `<li><img src="${iconURL}" alt="${extension.toUpperCase()}"> <a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a></li>`;
+            })
+            .join('')}
+        </ul>
                
             `;
 

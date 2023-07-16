@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     body {
       font-family: "Roboto", sans-serif;
@@ -18,7 +18,6 @@
       --bs-bg-opacity: 1;
       background-color: honeydew;
       border-radius: 15px;
-     
     }
 
     .py-3 {
@@ -50,61 +49,66 @@
       background-color: #000;
     }
 
- .search-container {
-  float: right;
-}
+    .search-container {
+      float: right;
+    }
 
-.search-container input[type=text] {
-  padding: 6px;
-  margin-top: 5px;
-  font-size: 15px;
-  border: solid 1px;
-}
+    .search-container input[type=text] {
+      padding: 6px;
+      margin-top: 5px;
+      font-size: 15px;
+      border: solid 1px;
+    }
 
- .search-container button {
-  float: right;
-  padding: 6px 10px;
-  margin-top: 5px;
-  
-  background: #ddd;
-  
-  border: none;
-  cursor: pointer;
-}
+    .search-container button {
+      float: right;
+      padding: 6px 10px;
+      margin-top: 5px;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+    }
 
- .search-container button:hover {
-  background: #ccc;
-}
+    .search-container button:hover {
+      background: #ccc;
+    }
 
-@media screen and (max-width: 600px) {
-   .search-container {
-    float: none;
-  }
-   .search-container input[type=text], .search-container button {
-    float: none;
-    display: block;
-    text-align: left;
-    width: 98%;
-    margin: 0;
-    padding: 14px;
-  }
-  .search-container input[type=text] {
-    border: 1px solid #ccc;  
-  }
-}
-#logo{
-   font-family: 'Quicksand';
-   font-size: 25px;
- }
- #profile-section {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background-color: #f1f1f1;
-  padding: 10px;
-}
+    @media screen and (max-width: 600px) {
+      .search-container {
+        float: none;
+      }
 
+      .search-container input[type=text],
+      .search-container button {
+        float: none;
+        display: block;
+        text-align: left;
+        width: 98%;
+        margin: 0;
+        padding: 14px;
+      }
 
+      .search-container input[type=text] {
+        border: 1px solid #ccc;
+      }
+    }
+
+    #logo {
+      font-family: 'Quicksand';
+      font-size: 25px;
+    }
+
+    #profile-section {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #f1f1f1;
+      padding: 10px;
+    }
+
+    #logout-link {
+      display: none;
+    }
   </style>
 </head>
 
@@ -128,7 +132,6 @@
               <li class="nav-item">
                 <a class="nav-link" href="/compose">Compose</a>
               </li>
-              
               <li class="nav-item">
                 <a class="nav-link" href="/admin">Admin Panel</a>
               </li>
@@ -141,49 +144,57 @@
             </div>
           </div>
         </nav>
-       <div id="profile-section">
-  <span id="profile-name"></span>
-  <a href="#" id="logout-link" style="display: none;">Logout</a>
-</div>
-
-
+        <div id="profile-section">
+          <span id="profile-name"></span>
+          <a href="#" id="logout-link" style="display: none;">Logout</a>
+        </div>
       </div>
     </div>
   </div>
-  <script src="../jq/jquery.js" type="text/javascript"></script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
   <script>
-  // Assuming you have included jQuery library in your HTML
+  function getCookie(name) {
+    const cookieArr = document.cookie.split(";");
 
-$(document).ready(function() {
-  // Check if the user is logged in
-  if (localStorage.getItem('accessToken')) {
-    // Retrieve the user's profile information from local storage
-    const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+    for (let i = 0; i < cookieArr.length; i++) {
+      const cookiePair = cookieArr[i].split("=");
 
-    // Update the content of the profile section
-    $('#profile-name').text(`Welcome, ${userProfile.username}!`);
+      if (name === cookiePair[0].trim()) {
+        return decodeURIComponent(cookiePair[1]);
+      }
+    }
 
-    // Show the logout link
-    $('#logout-link').show();
+    return null;
   }
 
-  // Handle logout
-  $('#logout-link').on('click', function(e) {
-    e.preventDefault();
+  function setProfileInfo() {
+    const accessToken = getCookie('accessToken');
+    if (accessToken) {
+      const userProfile = getCookie('userProfile');
+      if (userProfile) {
+        const decodedUserProfile = JSON.parse(decodeURIComponent(userProfile));
+        const profileName = document.getElementById('profile-name');
+        profileName.textContent = `Welcome, ${decodedUserProfile.username}!`;
+      }
 
-    // Clear the access token and user profile from local storage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userProfile');
+      const logoutLink = document.getElementById('logout-link');
+      logoutLink.style.display = 'block';
+    }
+  }
 
-    // Redirect to the home page
+  function logout() {
+    document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userProfile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     window.location.href = '/';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    setProfileInfo();
   });
-});
-
-
-
-  
 </script>
+
 </body>
 
 </html>
