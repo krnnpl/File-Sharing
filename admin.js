@@ -4,7 +4,6 @@ const app= express();
 const path = require('path');
 const hbs = require("hbs");
 const { registerPartials } =require("hbs");
-const { authenticate, authenticateUser, isAdmin } = require('./middleware/auth');
 
 const templatepath =path.join(__dirname,"../templates/views/admin");
 const partialpath = path.join(__dirname, "../templates/partials");

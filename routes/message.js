@@ -20,16 +20,19 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage });
-
 // Create a new message with file upload support
-router.post('/', authenticate, upload.array('attachments'), async (req, res) => {
+// Create a new message with file upload support
+router.post('/compose', authenticateUser, upload.array('attachments'), async (req, res) => {
   const { receivers, subject, body } = req.body;
   const senderUsername = req.user.username; // Get the username of the sender
 
   try {
+    // Convert receivers to an array
+    const receiverArray = Array.isArray(receivers) ? receivers : receivers.split(",").map(receiver => receiver.trim());
+
     // Find the receiver users by their usernames
-    const receiverUsers = await User.find({ username: { $in: receivers } });
-    if (receiverUsers.length !== receivers.length) {
+    const receiverUsers = await User.find({ username: { $in: receiverArray } });
+    if (receiverUsers.length !== receiverArray.length) {
       return res.status(400).json({ error: 'Invalid receiver(s)' });
     }
     const receiverUsernames = receiverUsers.map(user => user.username);
@@ -60,6 +63,8 @@ router.post('/', authenticate, upload.array('attachments'), async (req, res) => 
   }
 });
 
+
+
 // Get all messages
 router.get('/allMessages',authenticateUser, isAdmin, async (req, res) => {
   try {
@@ -79,7 +84,7 @@ router.get('/attachments/:filename', (req, res) => {
 });
 
 // Get user's inbox
-router.get('/inbox', authenticate, async (req, res) => {
+router.get('/inbox', authenticateUser, async (req, res) => {
     try {
       const username = req.user.username; // Get the username of the authorized user
   
@@ -94,7 +99,7 @@ router.get('/inbox', authenticate, async (req, res) => {
   });
   
 // Get user's outbox
-router.get('/outbox', authenticate, async (req, res) => {
+router.get('/outbox', authenticateUser, async (req, res) => {
     try {
       const username = req.user.username; // Get the username of the authorized user
   
@@ -107,5 +112,40 @@ router.get('/outbox', authenticate, async (req, res) => {
       res.status(500).json({ error: 'Failed to retrieve outbox' });
     }
   });
+
+  // Delete a message
+router.delete('/messages/:id', authenticateUser, isAdmin, async (req, res) => {
+  const messageId = req.params.id;
+
+  try {
+    // Find the message by ID
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Perform authorization checks if required
+    // For example, you can check if the authenticated user is an admin and has the authority to delete the message
+
+    // Delete the message
+    await message.remove();
+
+    res.json({ message: 'Message deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete message' });
+  }
+});
+
+// Authorization middleware to check if the user is an admin
+const authorizeAdmin = (req, res, next) => {
+  // Assuming you have a way to determine if the authenticated user is an admin
+  if (req.user.isAdmin) {
+    next(); // User is authorized, proceed to the next middleware or route handler
+  } else {
+    res.status(403).json({ error: 'Unauthorized access' }); // User is not authorized
+  }
+};
+
   
 module.exports = router;

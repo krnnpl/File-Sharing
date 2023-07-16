@@ -40,12 +40,12 @@
 
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authenticateUser } = require('../middleware/auth');
 const Message = require('../models/messageSchema');
 const User = require('../models/userSchema');
 
 // Perform search in authorized user's inbox and outbox
-router.get('/', authenticate, async (req, res) => {
+router.get('/', authenticateUser, async (req, res) => {
   try {
     const { query } = req.query;
     const authorizedUsername = req.user.username;

@@ -217,32 +217,81 @@
     <h1 class="box">Swifty Share </h1>
     <section>
         <div class="signin">
-            <div class="content">
-                <h2>Sign In</h2>
-                <div class="form">
-                    <div class="inputBox">
-                        <input type="text" required>
-                        <label>Username</label>
-                    </div>
-                    <div class="inputBox">
-                        <input type="password" id="passwordInput" required>
-                        <label>Password</label>
-                    </div>
-                    <div class="inputBo">
-                        <input type="checkbox" id="checkbox"> Remember me
-                    </div>
-                    <div class="inputBox">
-                        <input type="submit" value="Login">
-                    </div>
-                </div>
-            </div>
+      <div class="content">
+        <h2> Login</h2>
+        <div class="form" >
+          <form class="loginform" id="form1">
+          <div class="inputBox">
+            <input type="text"  id="username" required>
+            <label>Username</label>
+          </div>
+          <div class="inputBox">
+            <input type="password" id="password" required>
+            <label>Password</label>
+          </div>
+          
+            
+         
+          
+        
+          <div class="inputBox">
+            <input type="submit" value="Login">
+          </div>
+          
+          <p id="error-message" style="color: red; display: none;"></p>
+          </div>
+          </form>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
     <footer>
         <p>&copy; 2023 Swifty Share. All rights reserved. | <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
     </footer>
     <script src="../jq/jquery.js" type="text/javascript"></script>
     <script src="../js/bootstrap.js" type="text/javascript"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Handle form submission
+      document.getElementById('form1').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Make API request to authenticate admin
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await response.json();
+
+          if (response.status === 200) {
+            // Admin authenticated successfully
+            // Save access token in cookies
+           
+            // Redirect to admin homepage
+            window.location.href = '/inbox';
+          } else {
+            // Invalid password for admin
+            document.getElementById('error-message').textContent = ' Invalid username or password';
+            document.getElementById('error-message').style.display = 'block';
+          // Set a timeout to hide the error message after 3 seconds
+        setTimeout(() => {
+          document.getElementById('error-message').style.display = 'none';
+        }, 3000);
+      }
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

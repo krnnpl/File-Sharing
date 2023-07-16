@@ -74,7 +74,9 @@ connectDB();
 //view engine configuration
 //app.set('view engine', 'hbs');
 
-
+app.use('/css', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/css")));
+app.use('/js', express.static(path.join(__dirname,"../node_modules/bootstrap/dist/js")));
+app.use('/jq', express.static(path.join(__dirname,"../node_modules/jquery/dist")));
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 

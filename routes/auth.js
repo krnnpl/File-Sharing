@@ -65,9 +65,23 @@ router.post('/login', async (req, res) => {
 
     // Generate access token
     const accessToken = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+    // Retrieve the user's profile information
+    const userProfile = {
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      // Add any other profile fields you want to display
+    };
 
+    
+    // Store the access token in the session or a cookie
+    req.session.accessToken = accessToken;
+    req.session.userProfile = userProfile;
+    // Set the access token as an HTTP-only cookie
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+    res.cookie('userProfile', userProfile, { httpOnly: true });
     // User authenticated successfully
-    res.json({ message: 'User authenticated successfully', accessToken });
+    res.json({ message: 'User authenticated successfully' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to authenticate user' });
@@ -162,11 +176,10 @@ router.delete('/users/:username', authenticateUser, isAdmin, async (req, res) =>
     res.status(500).json({ error: 'Failed to delete user' });
   }
 });
-//get all users (accessible only to authorized admin)
-router.get
+
 // Reset user password (accessible only to authorized admin users)
-router.post('/reset-password/:username', authenticateUser, isAdmin, async (req, res) => {
-  const { username } = req.params;
+router.post('/reset-password', authenticateUser, isAdmin, async (req, res) => {
+  const { username } = req.body;
   const { newPassword } = req.body;
 
   try {
