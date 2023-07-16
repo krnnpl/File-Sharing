@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Create a new message with file upload support
-router.post('/', authenticate, upload.array('attachments'), async (req, res) => {
+router.post('/compose', authenticateUser, upload.array('attachments'), async (req, res) => {
   const { receivers, subject, body } = req.body;
   const senderUsername = req.user.username; // Get the username of the sender
 
@@ -78,7 +78,7 @@ router.get('/attachments/:filename', (req, res) => {
 });
 
 // Get user's inbox
-router.get('/inbox', authenticate, async (req, res) => {
+router.get('/inbox', authenticateUser, async (req, res) => {
     try {
       const username = req.user.username; // Get the username of the authorized user
   
@@ -93,7 +93,7 @@ router.get('/inbox', authenticate, async (req, res) => {
   });
   
 // Get user's outbox
-router.get('/outbox', authenticate, async (req, res) => {
+router.get('/outbox', authenticateUser, async (req, res) => {
     try {
       const username = req.user.username; // Get the username of the authorized user
   

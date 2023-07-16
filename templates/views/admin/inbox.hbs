@@ -6,6 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-RElG/AxZ6DUCYo6/F4yAAQMsun25lgnvKy/Z7wDkZr2Oktj2oo47a8IxNynBl7Qs0L5uNGvWYqJgsSTWjW7vwQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <title>FILE SHARING</title>
     <style>
         body {
@@ -16,6 +21,17 @@
         }
 
         #messagesTable tbody tr {
+            cursor: pointer;
+        }
+
+        .modal {
+            margin-top: 70px;
+        }
+
+        /* Custom CSS for delete icon */
+        .delete-icon {
+            
+      color: red;
             cursor: pointer;
         }
     </style>
@@ -32,11 +48,12 @@
                 <table id="messagesTable" class="table table-striped">
                     <thead>
                         <tr>
+                            <th>Date</th>
                             <th>Sender</th>
                             <th>Receivers</th>
                             <th>Subject</th>
                             <th>Attachments</th>
-                            <th>Date</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,12 +88,12 @@
 
             // Send a GET request to retrieve all messages
             fetch('/api/messages/allMessages', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + accessToken // Replace with the actual access token
-                    }
-                })
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken // Replace with the actual access token
+                }
+            })
                 .then(response => response.json())
                 .then(messages => {
                     // Sort messages by date in descending order
@@ -90,14 +107,19 @@
                     messages.forEach(message => {
                         const row = document.createElement('tr');
                         const receivers = message.receivers.join(', ');
-                        const attachments = message.attachments.map(attachment => `<a href="${attachment.downloadLink}" target="_blank">${attachment.filename}</a>`).join('<br>');
+                        const attachments = getAttachmentDetails(message.attachments);
 
                         row.innerHTML = `
+                            
+                            <td>${new Date(message.createdAt).toLocaleString()}</td>
                             <td>${message.sender}</td>
                             <td>${receivers}</td>
                             <td>${message.subject}</td>
                             <td>${attachments}</td>
-                            <td>${new Date(message.createdAt).toLocaleString()}</td>
+                            <td>
+                                 <i class="fas fa-trash-alt delete-icon" data-message-id="${message.id}"></i>
+                            </td>
+
                         `;
 
                         row.addEventListener('click', () => {
@@ -106,11 +128,84 @@
 
                         tableBody.appendChild(row);
                     });
+
+                    // Attach click event listener to delete icons
+                    const deleteIcons = document.querySelectorAll('.delete-icon');
+                    deleteIcons.forEach(icon => {
+                        icon.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent triggering the row click event
+                            const messageId = event.target.getAttribute('data-message-id');
+                            deleteMessage(messageId);
+                        });
+                    });
                 })
                 .catch(error => {
                     console.error(error);
                     alert('Failed to fetch messages.');
                 });
+        }
+
+        // Function to get attachment details with icons and short names
+        function getAttachmentDetails(attachments) {
+            const MAX_ATTACHMENTS = 2;
+
+            if (attachments.length <= MAX_ATTACHMENTS) {
+                return attachments
+                    .map((attachment) => {
+                        const filename = attachment.filename;
+                        const extension = filename.split('.').pop().toLowerCase();
+                        let shortName = filename.split(' ').slice(0, 2).join(' ');
+                        let iconURL = getIconURL(extension);
+
+                        return `<img src="${iconURL}" alt="${extension.toUpperCase()}"> ${shortName}`;
+                    })
+                    .join('<br>');
+            } else {
+                const firstTwoAttachments = attachments.slice(0, MAX_ATTACHMENTS);
+                const remainingCount = attachments.length - MAX_ATTACHMENTS;
+                const firstTwoDetails = firstTwoAttachments
+                    .map((attachment) => {
+                        const filename = attachment.filename;
+                        const extension = filename.split('.').pop().toLowerCase();
+                        let shortName = filename.split(' ').slice(0, 2).join(' ');
+                        let iconURL = getIconURL(extension);
+
+                        return `<img src="${iconURL}" alt="${extension.toUpperCase()}"> ${shortName}`;
+                    })
+                    .join('<br>');
+
+                return `${firstTwoDetails} + ${remainingCount} more`;
+            }
+        }
+
+        // Function to get the icon URL based on the file extension
+        function getIconURL(extension) {
+            // Add more file extensions and their corresponding icon URLs as needed
+            const iconURLs = {
+                pdf: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_pdf_x16.png',
+                png: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_image_x16.png',
+                jpg: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_image_x16.png',
+                jpeg: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_image_x16.png',
+                docx: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_word_x16.png',
+                mp4: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_video_x16.png',
+                gif: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_gif_x16.png',
+                doc: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_word_x16.png',
+                wp: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_word_x16.png',
+                txt: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_text_x16.png',
+                rtf: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_rtf_x16.png',
+                html: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_html_x16.png',
+                ppt: 'https://ssl.gstatic.com/docs/doclist/images/icon_8_presentation_list.png',
+                xlsx: 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_excel_x16.png',
+                // Add more file extensions and their corresponding icon URLs here
+            };
+
+            // Check if the file extension exists in the iconURLs object
+            if (extension in iconURLs) {
+                return iconURLs[extension];
+            }
+
+            // If the file extension is not found, use a generic icon URL
+            return 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_generic_x16.png';
         }
 
         // Function to open the message in a modal
@@ -120,7 +215,7 @@
             const modalBody = modal.querySelector('.modal-body');
 
             // Populate the modal with message data
-            modalTitle.innerText = message.subject;
+            modalTitle.innerText = message.subject || ''; // Add a default empty string if subject is undefined
             modalBody.innerHTML = `
                 <p><strong>Sender:</strong> ${message.sender}</p>
                 <p><strong>Receivers:</strong> ${message.receivers.join(', ')}</p>
@@ -137,6 +232,33 @@
             // Show the modal
             modal.classList.add('show');
             modal.style.display = 'block';
+        }
+
+        // Function to delete a message
+        function deleteMessage(messageId) {
+            // Get the access token from the cookie
+            var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
+
+            // Send a DELETE request to delete the message
+            fetch(`/api/messages/${messageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken // Replace with the actual access token
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Message deleted successfully, refresh the messages
+                        fetchMessages();
+                    } else {
+                        throw new Error('Failed to delete message.');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Failed to delete message.');
+                });
         }
 
         // Call the fetchMessages function when the page is loaded

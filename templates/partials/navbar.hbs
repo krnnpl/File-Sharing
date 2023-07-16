@@ -95,7 +95,15 @@
 #logo{
    font-family: 'Quicksand';
    font-size: 25px;
-        }
+ }
+ #profile-section {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: #f1f1f1;
+  padding: 10px;
+}
+
 
   </style>
 </head>
@@ -132,13 +140,50 @@
               </form>
             </div>
           </div>
-
-
         </nav>
+       <div id="profile-section">
+  <span id="profile-name"></span>
+  <a href="#" id="logout-link" style="display: none;">Logout</a>
+</div>
+
+
       </div>
     </div>
   </div>
+  <script src="../jq/jquery.js" type="text/javascript"></script>
+  <script>
+  // Assuming you have included jQuery library in your HTML
 
+$(document).ready(function() {
+  // Check if the user is logged in
+  if (localStorage.getItem('accessToken')) {
+    // Retrieve the user's profile information from local storage
+    const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+
+    // Update the content of the profile section
+    $('#profile-name').text(`Welcome, ${userProfile.username}!`);
+
+    // Show the logout link
+    $('#logout-link').show();
+  }
+
+  // Handle logout
+  $('#logout-link').on('click', function(e) {
+    e.preventDefault();
+
+    // Clear the access token and user profile from local storage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userProfile');
+
+    // Redirect to the home page
+    window.location.href = '/';
+  });
+});
+
+
+
+  
+</script>
 </body>
 
 </html>

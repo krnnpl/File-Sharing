@@ -78,9 +78,23 @@ router.post('/signin', async (req, res) => {
   
       // Generate access token
       const accessToken = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+
+      
+    // Retrieve the user's profile information
+    const userProfile = {
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      // Add any other profile fields you want to display
+    };
+
+      req.session.accessToken=accessToken;
+
+      res.cookie('accessToken', accessToken, { httpOnly: true});
+
   
       // User authenticated successfully
-      res.json({ message: 'User authenticated successfully', accessToken });
+      res.json({ message: 'User authenticated successfully', accessToken, userProfile });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to authenticate user' });

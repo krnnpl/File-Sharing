@@ -85,7 +85,7 @@
 
                 <div class="container">
                     <div class="form-container">
-                        <form action="{{action}}" method="post" enctype="multipart/form-data">
+                        <form id="composeForm"   action="{{action}}" method="post" enctype="multipart/form-data">
                             <label for="receiver">To:</label>
                             <textarea id="receiver" name="receiver" required>{{receiver}}</textarea>
                             <label for="subject">Subject:</label>
@@ -94,8 +94,8 @@
                             <label for="message">Message:</label>
                             <textarea id="message" name="message" required>{{message}}</textarea>
 
-                            <label for="files">Files:</label>
-                            <input type="file" id="files" name="files" multiple>
+                            <label for="attachments">Files:</label>
+                            <input type="file" id="files" name="attachments" multiple>
 
                             <button type="submit"><i class="fas fa-paper-plane"></i></button>
                         </form>
@@ -108,6 +108,46 @@
             </div>
         </div>
     </div>
+    <script>
+        // Get the form element from the HTML template
+const form = document.querySelector('#composeForm');
+
+// Add an event listener to the form submit event
+form.addEventListener('submit', async (event) => {
+  event.preventDefault(); // Prevent the default form submission
+
+  // Get the form data
+  const receiver = form.querySelector('#receiver').value;
+  const subject = form.querySelector('#subject').value;
+  const message = form.querySelector('#message').value;
+
+  // Create a FormData object to send the form data with files
+  const formData = new FormData(form);
+
+  try {
+    // Send the form data to the server using fetch API
+    const response = await fetch('/api/messages/compose', {
+      method: 'POST',
+      body: formData,
+    });
+
+    // Check the response status
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Message created successfully:', data.message);
+      // TODO: Add your desired logic after successful message creation
+    } else {
+      const errorData = await response.json();
+      console.error('Failed to create message:', errorData.error);
+      // TODO: Add your desired error handling logic
+    }
+  } catch (err) {
+    console.error('Failed to create message:', err);
+    // TODO: Add your desired error handling logic
+  }
+});
+
+    </script>
 </body>
 
 </html>
