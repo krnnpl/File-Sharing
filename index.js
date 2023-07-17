@@ -113,7 +113,10 @@ app.get('/', (req, res) => {
           res.render("sent");
   
       });
-  
+      
+      app.get('/result', (req, res) => {
+        res.render("result");
+      });
   
   app.get('/login', (req, res) => {
       res.send('Hello signin  world from server')

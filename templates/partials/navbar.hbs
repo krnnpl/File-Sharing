@@ -137,8 +137,8 @@
               </li>
             </ul>
             <div class="search-container">
-              <form action="/action">
-                <input type="text" placeholder="Search.." name="search">
+              <form id="search-form"> <!-- Add an id to the form -->
+                <input type="text" placeholder="Search.." name="query"> <!-- Update the input name -->
                 <button type="submit"><i class="fa fa-search"></i></button>
               </form>
             </div>
@@ -151,49 +151,56 @@
       </div>
     </div>
   </div>
-
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
   <script>
-    function getCookie(name) {
-      const cookieArr = document.cookie.split(";");
+  // Update the profile name and logout link
+  $(document).ready(function() {
+    const profileName = Cookies.get('profileName');
+    if (profileName) {
+      $('#profile-name').text(profileName);
+      $('#logout-link').show();
+    }
+  });
 
-      for (let i = 0; i < cookieArr.length; i++) {
-        const cookiePair = cookieArr[i].split("=");
+  // Handle form submission
+  $('#search-form').submit(function(event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+    const query = $('input[name="query"]').val(); // Get the search query
+    if (query) {
+      // Get the access token from the cookie
+      const accessToken = Cookies.get('accessToken');
 
-        if (name === cookiePair[0].trim()) {
-          return decodeURIComponent(cookiePair[1]);
+      // Send an AJAX request to the search API endpoint
+      $.ajax({
+        url: '/api/search',
+        type: 'GET',
+        data: { query: query },
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        success: function(response) {
+          // Clear the table body
+          const tableBody = $('#usersTable tbody');
+          tableBody.empty();
+
+          // Populate the table with search results
+          response.messages.forEach(message => {
+            const row = $('<tr>');
+            row.append(`<td>${message.sender}</td>`);
+            row.append(`<td>${message.subject}</td>`);
+            row.append(`<td>${message.body}</td>`);
+            tableBody.append(row);
+          });
+        },
+        error: function(error) {
+          console.error(error);
         }
-      }
-
-      return null;
+      });
     }
+  });
+</script>
 
-    function setProfileInfo() {
-      const accessToken = getCookie('accessToken');
-      if (accessToken) {
-        const userProfile = getCookie('userProfile');
-        if (userProfile) {
-          const decodedUserProfile = JSON.parse(decodeURIComponent(userProfile));
-          const profileName = document.getElementById('profile-name');
-          profileName.textContent = `Welcome, ${decodedUserProfile.username}!`;
-        }
-
-        const logoutLink = document.getElementById('logout-link');
-        logoutLink.style.display = 'block';
-      }
-    }
-
-    function logout() {
-      document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = 'userProfile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      window.location.href = '/';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      setProfileInfo();
-    });
-  </script>
 </body>
 
 </html>
