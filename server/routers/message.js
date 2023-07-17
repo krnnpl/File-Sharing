@@ -27,9 +27,13 @@ router.post('/compose', authenticateUser, upload.array('attachments'), async (re
   const senderUsername = req.user.username; // Get the username of the sender
 
   try {
+    // Convert receivers to an array
+    const receiverArray = Array.isArray(receivers) ? receivers : receivers.split(",").map(receiver => receiver.trim());
+
+
     // Find the receiver users by their usernames
-    const receiverUsers = await User.find({ username: { $in: receivers } });
-    if (receiverUsers.length !== receivers.length) {
+    const receiverUsers = await User.find({ username: { $in: receiverArray } });
+    if (receiverUsers.length !== receiverArray.length) {
       return res.status(400).json({ error: 'Invalid receiver(s)' });
     }
     const receiverUsernames = receiverUsers.map(user => user.username);
@@ -61,7 +65,7 @@ router.post('/compose', authenticateUser, upload.array('attachments'), async (re
 });
 
 // Get all messages
-router.get('/allMessages',authenticateUser, isAdmin, async (req, res) => {
+router.get('/allMessages', authenticateUser, isAdmin, async (req, res) => {
   try {
     const messages = await Message.find();
     res.json(messages);
@@ -79,32 +83,71 @@ router.get('/attachments/:filename', (req, res) => {
 
 // Get user's inbox
 router.get('/inbox', authenticateUser, async (req, res) => {
-    try {
-      const username = req.user.username; // Get the username of the authorized user
-  
-      // Find messages where the authorized user is in the receiver array
-      const inboxMessages = await Message.find({ receivers: username });
-  
-      res.json(inboxMessages);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to retrieve inbox' });
-    }
-  });
-  
+  try {
+    const username = req.user.username; // Get the username of the authorized user
+
+    // Find messages where the authorized user is in the receiver array
+    const inboxMessages = await Message.find({ receivers: username });
+
+    res.json(inboxMessages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to retrieve inbox' });
+  }
+});
+
 // Get user's outbox
 router.get('/outbox', authenticateUser, async (req, res) => {
-    try {
-      const username = req.user.username; // Get the username of the authorized user
-  
-      // Find messages where the authorized user is the sender
-      const outboxMessages = await Message.find({ sender: username });
-  
-      res.json(outboxMessages);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to retrieve outbox' });
+  try {
+    const username = req.user.username; // Get the username of the authorized user
+
+    // Find messages where the authorized user is the sender
+    const outboxMessages = await Message.find({ sender: username });
+
+    res.json(outboxMessages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to retrieve outbox' });
+  }
+});
+
+
+// Delete a message and its attached files
+router.delete('/delete/:id', authenticateUser, isAdmin, async (req, res) => {
+  const messageId = req.params.id;
+
+  try {
+    // Find the message by ID
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
     }
-  });
-  
+
+    // Delete the attached files
+    message.attachments.forEach(attachment => {
+      const filePath = path.join(__dirname, '..', 'uploads', path.basename(attachment.path));
+
+      // Check if the file exists
+      if (fs.existsSync(filePath)) {
+        // Delete the file
+        fs.unlinkSync(filePath);
+      }
+    });
+
+    // Delete the message
+    const result = await Message.deleteOne({ _id: messageId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    res.json({ message: 'Message and attached files deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete message' });
+  }
+});
+
+
 module.exports = router;

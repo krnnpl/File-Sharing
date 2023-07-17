@@ -134,7 +134,7 @@
                     deleteIcons.forEach(icon => {
                         icon.addEventListener('click', (event) => {
                             event.stopPropagation(); // Prevent triggering the row click event
-                            const messageId = event.target.getAttribute('data-message-id');
+                            const messageId = event.target.getAttribute('_id');
                             deleteMessage(messageId);
                         });
                     });
@@ -240,13 +240,13 @@
             modal.style.display = 'block';
         }
 
-        // Function to delete a message
-        function deleteMessage(messageId) {
+// Function to delete a message
+        function deleteMessage(_id) {
             // Get the access token from the cookie
             var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
 
             // Send a DELETE request to delete the message
-            fetch(`/api/messages/${messageId}`, {
+            fetch(`/api/messages/delete/${_id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -255,8 +255,10 @@
             })
                 .then(response => {
                     if (response.ok) {
+                        
                         // Message deleted successfully, refresh the messages
                         fetchMessages();
+                        alert('Message deleted successfully');
                     } else {
                         throw new Error('Failed to delete message.');
                     }

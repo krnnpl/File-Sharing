@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 
   <style>
     body {
       font-family: "Roboto", sans-serif;
@@ -28,10 +29,12 @@
 
     .navbar-nav .nav-link {
       position: relative;
-      color: #000;
+      color: hwb(0 0% 100%);
       text-decoration: none;
       padding: 10px;
       transition: background-color 0.3s ease;
+      color: black;
+       
     }
 
     .navbar-nav .nav-link:before {
@@ -92,22 +95,9 @@
         border: 1px solid #ccc;
       }
     }
-
     #logo {
       font-family: 'Quicksand';
       font-size: 25px;
-    }
-
-    #profile-section {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background-color: #f1f1f1;
-      padding: 10px;
-    }
-
-    #logout-link {
-      display: none;
     }
   </style>
 </head>
@@ -135,6 +125,15 @@
               <li class="nav-item">
                 <a class="nav-link" href="/admin">Admin Panel</a>
               </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Dashbord
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                  <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                </ul>
+              </li>
             </ul>
             <div class="search-container">
               <form action="/action">
@@ -144,57 +143,11 @@
             </div>
           </div>
         </nav>
-        <div id="profile-section">
-          <span id="profile-name"></span>
-          <a href="#" id="logout-link" style="display: none;">Logout</a>
-        </div>
       </div>
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
-  <script>
-  function getCookie(name) {
-    const cookieArr = document.cookie.split(";");
-
-    for (let i = 0; i < cookieArr.length; i++) {
-      const cookiePair = cookieArr[i].split("=");
-
-      if (name === cookiePair[0].trim()) {
-        return decodeURIComponent(cookiePair[1]);
-      }
-    }
-
-    return null;
-  }
-
-  function setProfileInfo() {
-    const accessToken = getCookie('accessToken');
-    if (accessToken) {
-      const userProfile = getCookie('userProfile');
-      if (userProfile) {
-        const decodedUserProfile = JSON.parse(decodeURIComponent(userProfile));
-        const profileName = document.getElementById('profile-name');
-        profileName.textContent = `Welcome, ${decodedUserProfile.username}!`;
-      }
-
-      const logoutLink = document.getElementById('logout-link');
-      logoutLink.style.display = 'block';
-    }
-  }
-
-  function logout() {
-    document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'userProfile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/';
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    setProfileInfo();
-  });
-</script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
