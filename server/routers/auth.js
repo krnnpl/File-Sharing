@@ -81,20 +81,14 @@ router.post('/signin', async (req, res) => {
 
       
     // Retrieve the user's profile information
-    const userProfile = {
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      // Add any other profile fields you want to display
-    };
-
+    
       req.session.accessToken=accessToken;
 
       res.cookie('accessToken', accessToken, { httpOnly: true});
 
   
       // User authenticated successfully
-      res.json({ message: 'User authenticated successfully', accessToken, userProfile });
+      res.json({ message: 'User authenticated successfully', accessToken });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to authenticate user' });
@@ -173,8 +167,8 @@ router.get('/users', authenticateUser, isAdmin, async (req, res) => {
   });
 
   // Reset user password (accessible only to authorized admin users)
-router.post('/reset-password/:username', authenticateUser, isAdmin, async (req, res) => {
-  const { username } = req.params;
+router.post('/reset-password', authenticateUser, isAdmin, async (req, res) => {
+  const { username } = req.body;
   const { newPassword } = req.body;
 
   try {
@@ -194,6 +188,27 @@ router.post('/reset-password/:username', authenticateUser, isAdmin, async (req, 
     res.status(500).json({ error: 'Failed to reset password' });
   }
 });
+
+router.get('/profiles', authenticateUser, (req, res) => {
+  // Access the authenticated user's information from the request object
+  const { firstName, lastName, username, phoneNumber, branch } = req.user;
+
+  // Render the profile view (profile.hbs) and pass the user's data as context
+  res.render('profiles', { firstName, lastName, username, phoneNumber, branch });
+});
+// Update the /profile endpoint to return user data as JSON
+router.get('/profile', authenticateUser, (req, res) => {
+  // Access the authenticated user's information from the request object
+  const { username } = req.user;
+
+  // Return the user's data as JSON
+  res.json({ username });
+});
+
+
+
+
+
   
 
 module.exports = router;

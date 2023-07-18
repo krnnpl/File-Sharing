@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
   <style>
     body {
       font-family: "Roboto", sans-serif;
@@ -48,52 +49,64 @@
     .navbar-nav .nav-link:hover:before {
       background-color: #000;
     }
+
     .search-container {
-  float: right;
-}
+      float: right;
+    }
 
-.search-container input[type=text] {
-  padding: 6px;
-  margin-top: 5px;
-  font-size: 15px;
-  border: solid 1px;
-}
+    .search-container input[type=text] {
+      padding: 6px;
+      margin-top: 5px;
+      font-size: 15px;
+      border: solid 1px;
+    }
 
- .search-container button {
-  float: right;
-  padding: 6px 10px;
-  margin-top: 5px;
-  
-  background: #ddd;
-  
-  border: none;
-  cursor: pointer;
-}
+    .search-container button {
+      float: right;
+      padding: 6px 10px;
+      margin-top: 5px;
 
- .search-container button:hover {
-  background: #ccc;
-}
+      background: #ddd;
 
-@media screen and (max-width: 600px) {
-   .search-container {
-    float: none;
-  }
-   .search-container input[type=text], .search-container button {
-    float: none;
-    display: block;
-    text-align: left;
-    width: 98%;
-    margin: 0;
-    padding: 14px;
-  }
-  .search-container input[type=text] {
-    border: 1px solid #ccc;  
-  }
-}
-#logo {
-    font-family: 'Quicksand';
-    font-size: 25px;
-}
+      border: none;
+      cursor: pointer;
+    }
+
+    .search-container button:hover {
+      background: #ccc;
+    }
+
+    @media screen and (max-width: 600px) {
+      .search-container {
+        float: none;
+      }
+
+      .search-container input[type=text],
+      .search-container button {
+        float: none;
+        display: block;
+        text-align: left;
+        width: 98%;
+        margin: 0;
+        padding: 14px;
+      }
+
+      .search-container input[type=text] {
+        border: 1px solid #ccc;
+      }
+    }
+
+    #logo {
+      font-family: 'Quicksand';
+      font-size: 25px;
+    }
+
+    #usernamePlaceholder {
+      color: brown;
+      /* Change the font color to brown */
+      font-weight: bold;
+      /* Make the font bold */
+    }
   </style>
 </head>
 
@@ -109,19 +122,30 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link" href="/admin/inbox">All Incoming <span class="sr-only"></span></a>
+                <a class="nav-link" href="/admin/inbox"><i class="fa fa-envelope"></i> All Incoming <span
+                    class="sr-only"></span></a>
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="/admin/users">View Users</a>
+                <a class="nav-link" href="/admin/users"><i class="fa fa-users"></i> View Users</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/admin/register">Add User</a>
+                <a class="nav-link" href="/admin/register"><i class="fa fa-user-plus"></i> Add User</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <i class="fa fa-user-secret" aria-hidden="true"></i> <span id="usernamePlaceholder">//username//</span>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="/profiles"><i class="fa fa-user"></i> Profile</a></li>
+                  <li><a class="dropdown-item" href="/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+                </ul>
               </li>
 
             </ul>
             <div class="search-container">
-              <form action="/action">
+              <form action="/search" method="GET">
                 <input type="text" placeholder="Search.." name="search">
                 <button type="submit"><i class="fa fa-search"></i></button>
               </form>
@@ -133,7 +157,42 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
+  <script src="../jq/jquery.js" type="text/javascript"></script>
+  <script>
+    // Function to fetch the user's data and update the username placeholder
+    function updateUsernamePlaceholder() {
+      fetch('/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + getCookie('accessToken')
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const usernamePlaceholder = document.getElementById('usernamePlaceholder');
+          if (data.username) {
+            usernamePlaceholder.innerText = data.username; // Update the placeholder with the actual username
+          }
+        })
+        .catch(error => console.error('Error fetching user profile:', error));
+    }
 
+    // Function to get a specific cookie by name
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Call the function to update the username placeholder when the page loads
+    updateUsernamePlaceholder();
+  </script>
 </body>
 
 </html>

@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authenticateUser } = require('../middleware/auth');
 const Message = require('../model/messageSchema');
 const User = require('../model/userSchema');
 
 // Perform search in authorized user's inbox and outbox
-router.get('/', authenticate, async (req, res) => {
+router.get('/', authenticateUser, async (req, res) => {
   try {
     const { query } = req.query;
     const authorizedUsername = req.user.username;
@@ -29,7 +29,7 @@ router.get('/', authenticate, async (req, res) => {
           { branch: { $regex: query, $options: 'i' } }
         ]
       },
-      { username: 1,firstName, lastName, phoneNumber, branch: 1 }
+      { username: 1,firstName: 1, lastName: 1, phoneNumber: 1, branch: 1 }
     );
 
     res.json({ messages, users });

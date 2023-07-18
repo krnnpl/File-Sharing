@@ -105,6 +105,16 @@ app.get('/inbox', (req, res) => {
         // Redirect the user to the login page or any other appropriate page
         res.redirect('/');
       });
+      app.get('/logout-admin', (req, res) => {
+        // Clear the access token from the session or cookie
+        req.session.accessToken = null; // If using session
+        res.clearCookie('accessToken'); // If using cookie, replace 'accessToken' with the actual name of your cookie
+      
+        // Redirect the user to the login page or any other appropriate page
+        res.redirect('/admin');
+      });
+
+
 
 
 

@@ -117,7 +117,7 @@
                             <td>${message.subject}</td>
                             <td>${attachments}</td>
                             <td>
-                                 <i class="fas fa-trash-alt delete-icon" data-message-id="${message.id}"></i>
+                                 <i class="fas fa-trash-alt delete-icon" data-message-id="${message._id}"></i>
                             </td>
 
                         `;
@@ -134,7 +134,7 @@
                     deleteIcons.forEach(icon => {
                         icon.addEventListener('click', (event) => {
                             event.stopPropagation(); // Prevent triggering the row click event
-                            const messageId = event.target.getAttribute('_id');
+                            const messageId = event.target.getAttribute('data-message-id');
                             deleteMessage(messageId);
                         });
                     });
@@ -240,7 +240,7 @@
             modal.style.display = 'block';
         }
 
-// Function to delete a message
+        // Function to delete a message
         function deleteMessage(_id) {
             // Get the access token from the cookie
             var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");

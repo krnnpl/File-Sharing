@@ -5,6 +5,7 @@ const path = require('path');
 const Message = require('../model/messageSchema');
 const User = require('../model/userSchema');
 const { authenticate, authenticateUser, isAdmin } = require('../middleware/auth');
+const fs= require('fs');
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -148,6 +149,5 @@ router.delete('/delete/:id', authenticateUser, isAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete message' });
   }
 });
-
 
 module.exports = router;
