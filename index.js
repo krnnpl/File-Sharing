@@ -114,14 +114,20 @@ app.get('/', (req, res) => {
   
       });
       
-      app.get('/result', (req, res) => {
-        res.render("result");
-      });
-  
-  app.get('/login', (req, res) => {
-      res.send('Hello signin  world from server')
+        
+    app.get('/profile', (req, res) => {
+      res.render("profile");
   
   });
+  app.get('/logout', (req, res) => {
+    // Clear the access token from the session or cookie
+    req.session.accessToken = null; // If using session
+    res.clearCookie('accessToken'); // If using cookie, replace 'accessToken' with the actual name of your cookie
+  
+    // Redirect the user to the login page or any other appropriate page
+    res.redirect('/');
+  });
+  
   const adminRouter = require('./admin');
   app.use('/admin', adminRouter);
 // // Render admin login page for frontend

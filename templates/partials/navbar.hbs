@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Navbar</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     body {
@@ -97,18 +97,6 @@
       font-family: 'Quicksand';
       font-size: 25px;
     }
-
-    #profile-section {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background-color: #f1f1f1;
-      padding: 10px;
-    }
-
-    #logout-link {
-      display: none;
-    }
   </style>
 </head>
 
@@ -135,72 +123,117 @@
               <li class="nav-item">
                 <a class="nav-link" href="/admin">Admin Panel</a>
               </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Dashboard
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                  <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                </ul>
+              </li>
             </ul>
             <div class="search-container">
-              <form id="search-form"> <!-- Add an id to the form -->
-                <input type="text" placeholder="Search.." name="query"> <!-- Update the input name -->
+              <form id="search-form">
+                <input type="text" placeholder="Search.." name="query">
                 <button type="submit"><i class="fa fa-search"></i></button>
               </form>
             </div>
           </div>
         </nav>
-        <div id="profile-section">
-          <span id="profile-name"></span>
-          <a href="#" id="logout-link">Logout</a>
-        </div>
       </div>
     </div>
   </div>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <div id="result-container" class = "container"></div>
+
+
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
   <script>
-  // Update the profile name and logout link
-  $(document).ready(function() {
-    const profileName = Cookies.get('profileName');
-    if (profileName) {
-      $('#profile-name').text(profileName);
-      $('#logout-link').show();
-    }
-  });
+    // Handle form submission
+    $('#search-form').submit(function (event) {
+      event.preventDefault(); // Prevent the form from submitting normally
+      const query = $('input[name="query"]').val(); // Get the search query
+      if (query) {
+        // Get the access token from the cookie
+        var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
 
-  // Handle form submission
-  $('#search-form').submit(function(event) {
-    event.preventDefault(); // Prevent the form from submitting normally
-    const query = $('input[name="query"]').val(); // Get the search query
-    if (query) {
-      // Get the access token from the cookie
-      const accessToken = Cookies.get('accessToken');
+        // Send an AJAX request to the search API endpoint
+        $.ajax({
+          url: '/api/search',
+          type: 'GET',
+          data: { query: query },
+          headers: {
+            'Authorization': 'Bearer ' + accessToken
+          },
+          success: function (response) {
+            // Render the search results
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.innerHTML = '';
 
-      // Send an AJAX request to the search API endpoint
-      $.ajax({
-        url: '/api/search',
-        type: 'GET',
-        data: { query: query },
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        },
-        success: function(response) {
-          // Clear the table body
-          const tableBody = $('#usersTable tbody');
-          tableBody.empty();
+            if (response.messages.length) {
+              const messagesHeading = document.createElement('h2');
+              messagesHeading.textContent = 'Messages';
+              resultContainer.appendChild(messagesHeading);
 
-          // Populate the table with search results
-          response.messages.forEach(message => {
-            const row = $('<tr>');
-            row.append(`<td>${message.sender}</td>`);
-            row.append(`<td>${message.subject}</td>`);
-            row.append(`<td>${message.body}</td>`);
-            tableBody.append(row);
-          });
-        },
-        error: function(error) {
-          console.error(error);
-        }
-      });
-    }
-  });
-</script>
+              response.messages.forEach(function (message) {
+                const messageItem = document.createElement('div');
+                messageItem.classList.add('result-item');
 
+                const title = document.createElement('div');
+                title.classList.add('result-title');
+                title.textContent = message.subject;
+                messageItem.appendChild(title);
+
+                const description = document.createElement('div');
+                description.classList.add('result-description');
+                description.textContent = message.body;
+                messageItem.appendChild(description);
+
+                resultContainer.appendChild(messageItem);
+              });
+            } else {
+              const noMessages = document.createElement('p');
+              noMessages.textContent = 'No messages found.';
+              resultContainer.appendChild(noMessages);
+            }
+
+            if (response.users.length) {
+              const usersHeading = document.createElement('h2');
+              usersHeading.textContent = 'Users';
+              resultContainer.appendChild(usersHeading);
+
+              response.users.forEach(function (user) {
+                const userItem = document.createElement('div');
+                userItem.classList.add('result-item');
+
+                const username = document.createElement('div');
+                username.classList.add('result-title');
+                username.textContent = user.username;
+                userItem.appendChild(username);
+
+                const branch = document.createElement('div');
+                branch.classList.add('result-description');
+                branch.textContent = 'Branch: ' + user.branch;
+                userItem.appendChild(branch);
+
+                resultContainer.appendChild(userItem);
+              });
+            } else {
+              const noUsers = document.createElement('p');
+              noUsers.textContent = 'No users found.';
+              resultContainer.appendChild(noUsers);
+            }
+          },
+          error: function (error) {
+            console.error(error);
+          }
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>
