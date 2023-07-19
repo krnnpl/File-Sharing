@@ -1,36 +1,9 @@
-// const express = require('express');
-// const bodyParser = require('body-parser');
-// const authRoutes = require('./routes/auth');
-
-// const app = express();
-// const PORT = 3000;
-
-// // Middleware
-// app.use(bodyParser.json());
-
-// // Connect to MongoDB
-// const connectDB = require('./config/db');
-// connectDB();
-
-
-// // Routes
-// app.use('/api/auth', authRoutes);
-
-// // Start the server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
-
-
-
-
-
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 require('dotenv').config();
+const { authenticateForURL } = require('./middleware/auth');
 
 
 // Define the secret key for signing the access token
@@ -97,29 +70,29 @@ app.get('/', (req, res) => {
   res.render("login");
   });
   
-  app.get('/inbox', (req, res) => {
+  app.get('/inbox', authenticateForURL, (req, res) => {
       res.render("inbox");
       });
   
   
   
   
-      app.get('/compose', (req, res) => {
+      app.get('/compose', authenticateForURL, (req, res) => {
           res.render("compose");
   
       });
   
-      app.get('/sent', (req, res) => {
+      app.get('/sent', authenticateForURL, (req, res) => {
           res.render("sent");
   
       });
       
         
-    app.get('/profile', (req, res) => {
+    app.get('/profile', authenticateForURL, (req, res) => {
       res.render("profile");
   
   });
-  app.get('/logout', (req, res) => {
+  app.get('/logout', authenticateForURL, (req, res) => {
     // Clear the access token from the session or cookie
     req.session.accessToken = null; // If using session
     res.clearCookie('accessToken'); // If using cookie, replace 'accessToken' with the actual name of your cookie
