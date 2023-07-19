@@ -196,6 +196,13 @@ router.get('/profiles', authenticateUser, (req, res) => {
   // Render the profile view (profile.hbs) and pass the user's data as context
   res.render('profiles', { firstName, lastName, username, phoneNumber, branch });
 });
+router.get('/admin/profiles', authenticateUser,isAdmin, (req, res) => {
+  // Access the authenticated user's information from the request object
+  const { firstName, lastName, username, phoneNumber, branch } = req.user;
+
+  // Render the profile view (profile.hbs) and pass the user's data as context
+  res.render('admin/profiles', { firstName, lastName, username, phoneNumber, branch });
+});
 // Update the /profile endpoint to return user data as JSON
 router.get('/profile', authenticateUser, (req, res) => {
   // Access the authenticated user's information from the request object

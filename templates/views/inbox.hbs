@@ -24,6 +24,10 @@
         .modal{
             margin-top: 70px;
         }
+        .h2,h2{
+            margin-top: 100px;
+        }
+        
     </style>
 
 </head>
@@ -35,6 +39,7 @@
         <div class="row">
             <div class="col-md-10 col-12 mx-auto">
                 <h2>All Messages</h2>
+                
                 <table id="messagesTable" class="table table-striped">
                     <thead>
                         <tr>
@@ -49,6 +54,7 @@
                         <!-- Message data will be dynamically inserted here -->
                     </tbody>
                 </table>
+              
             </div>
         </div>
     </div>
@@ -191,7 +197,7 @@
             const modal = document.getElementById('messageModal');
             const modalTitle = modal.querySelector('.modal-title');
             const modalBody = modal.querySelector('.modal-body');
-            const forwardButton = modal.querySelector('.forward-button');
+           
 
             // Populate the modal with message data
             modalTitle.innerText = message.subject || ''; // Add a default empty string if subject is undefined

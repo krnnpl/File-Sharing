@@ -32,12 +32,24 @@
     .action-icon.edit-icon {
       color: blue;
     }
+
+    .input-group .toggle-password {
+      padding: 7px 10px;
+      cursor: pointer;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .h2,h2{
+            margin-top: 100px;
+        }
   </style>
 
 </head>
 
 <body>
-  {{>navbaradmin}}
+  {{> navbaradmin}}
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-10 col-12 mx-auto">
@@ -58,23 +70,40 @@
           </tbody>
         </table>
         <div id="passwordForm" style="display: none;">
-          <h4>Change Password</h4>
           <form onsubmit="changePassword(event)">
             <input type="hidden" id="changePasswordUsername" name="username">
             <div class="form-group">
-              <label>New Password</label>
-              <input type="password" name="newPassword" class="form-control" required>
+              <div class="input-group">
+                <input type="password" name="newPassword" id="newPasswordInput" class="form-control" required>
+                <div class="toggle-password input-group-append" onclick="togglePasswordVisibility()">
+                  <i class="fa fa-eye-slash"></i>
+                </div>
+              </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
             </div>
-            <button type="submit" class="btn btn-primary">Change Password</button>
           </form>
         </div>
-
       </div>
     </div>
   </div>
 
   <script src="../jq/jquery.js" type="text/javascript"></script>
   <script>
+    function togglePasswordVisibility() {
+      const newPasswordInput = document.getElementById("newPasswordInput");
+      const togglePasswordIcon = document.querySelector(".toggle-password i");
+
+      if (newPasswordInput.type === "password") {
+        newPasswordInput.type = "text";
+        togglePasswordIcon.classList.remove("fa-eye-slash");
+        togglePasswordIcon.classList.add("fa-eye");
+      } else {
+        newPasswordInput.type = "password";
+        togglePasswordIcon.classList.remove("fa-eye");
+        togglePasswordIcon.classList.add("fa-eye-slash");
+      }
+    }
+
     // Function to fetch users from the server and populate the table
     function fetchUsers() {
       // Send a GET request to retrieve all users
@@ -106,7 +135,7 @@
                 <span class="action-icon delete-icon" onclick="deleteUser('${user.username}')">
                   <i class="fa fa-trash"></i>
                 </span>
-                <span class="action-icon change-password-icon" onclick="showChangePasswordForm('${user.username}')">
+                <span class="action-icon change-password-icon" onclick="showChangePasswordForm('${user.username}', this)">
                   <i class="fa fa-key"></i>
                 </span>
                 <span class="action-icon edit-icon" onclick="editUser('${user.username}')">
@@ -148,11 +177,15 @@
         });
     }
 
-    // Function to show the change password form
-    function showChangePasswordForm(username) {
+    // Function to show the change password form below the user's row
+    function showChangePasswordForm(username, clickedElement) {
       const passwordForm = document.querySelector('#passwordForm');
       const changePasswordUsername = document.querySelector('#changePasswordUsername');
       changePasswordUsername.value = username;
+      
+      // Insert the password form after the clickedElement's parent row
+      const targetRow = clickedElement.closest('tr');
+      targetRow.parentNode.insertBefore(passwordForm, targetRow.nextSibling);
       passwordForm.style.display = 'block';
     }
 
@@ -184,19 +217,19 @@
           }
         })
         .catch(error => {
-  console.error(error);
-  const errorMessage = error.message || 'Failed to change password';
-  alert(errorMessage);
-});
+          console.error(error);
+          const errorMessage = error.message || 'Failed to change password';
+          alert(errorMessage);
+        });
     }
 
     // Function to hide the change password form
-function hideChangePasswordForm() {
-  const form = document.querySelector('#passwordForm form');
-  form.reset();
-  const passwordForm = document.querySelector('#passwordForm');
-  passwordForm.style.display = 'none';
-}
+    function hideChangePasswordForm() {
+      const form = document.querySelector('#passwordForm form');
+      form.reset();
+      const passwordForm = document.querySelector('#passwordForm');
+      passwordForm.style.display = 'none';
+    }
 
     // Function to edit a user
     function editUser(username) {

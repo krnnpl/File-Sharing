@@ -40,9 +40,7 @@ router.get('/register', (req, res) => {
   
   res.render('admin/register');
 });
-app.get('/profile', (req, res) => {
-  res.render("profile");
-});
+
 
 
 
