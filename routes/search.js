@@ -4,51 +4,84 @@ const { authenticate, authenticateUser } = require('../middleware/auth');
 const Message = require('../models/messageSchema');
 const User = require('../models/userSchema');
 
-// Perform search in authorized user's inbox and outbox
 router.get('/', authenticateUser, async (req, res) => {
   try {
     const { query } = req.query;
     const authorizedUsername = req.user.username;
     const isAdmin = req.user.isAdmin;
 
-    let searchQuery;
+    let inboxSearchQuery;
+    let outboxSearchQuery;
+
+    const searchRegex = new RegExp(query, 'i');
 
     if (isAdmin) {
       // If the user is an admin, search all messages
-      searchQuery = {
-        subject: { $regex: query, $options: 'i' }
+      inboxSearchQuery = {
+        $or: [
+          { subject: searchRegex },
+          { body: searchRegex },
+          { sender: searchRegex },
+          { receivers: searchRegex },
+          { 'attachments.filename': searchRegex }
+        ]
       };
+      outboxSearchQuery = inboxSearchQuery;
     } else {
       // Search in the authorized user's inbox and outbox
-      searchQuery = {
-        $or: [
-          { sender: authorizedUsername, subject: { $regex: query, $options: 'i' } },
-          { receivers: authorizedUsername, subject: { $regex: query, $options: 'i' } }
+      inboxSearchQuery = {
+        $and: [
+          { $or: [{ sender: authorizedUsername }, { receivers: authorizedUsername }] },
+          {
+            $or: [
+              { subject: searchRegex },
+              { body: searchRegex },
+              { sender: searchRegex },
+              { receivers: searchRegex },
+              { 'attachments.filename': searchRegex }
+            ]
+          }
+        ]
+      };
+      outboxSearchQuery = {
+        $and: [
+          { sender: authorizedUsername },
+          {
+            $or: [
+              { subject: searchRegex },
+              { body: searchRegex },
+              { sender: searchRegex },
+              { receivers: searchRegex },
+              { 'attachments.filename': searchRegex }
+            ]
+          }
         ]
       };
     }
 
     // Search messages based on the search query
-    const messages = await Message.find(searchQuery);
+    const inboxSearch = await Message.find(inboxSearchQuery);
+    const outboxSearch = await Message.find(outboxSearchQuery);
 
     // Search users by username, branch name, first name, and last name
     const users = await User.find(
       {
         $or: [
-          { username: { $regex: query, $options: 'i' } },
-          { branch: { $regex: query, $options: 'i' } },
-          { firstName: { $regex: query, $options: 'i' } },
-          { lastName: { $regex: query, $options: 'i' } }
+          { username: searchRegex },
+          { branch: searchRegex },
+          { firstName: searchRegex },
+          { lastName: searchRegex }
         ]
       },
       { username: 1, branch: 1, firstName: 1, lastName: 1 }
     );
-    res.json({ messages, users });
-   // res.render('result', { messages, users });
+
+    res.json({ inboxSearch, outboxSearch, users });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to perform search' });
   }
 });
+
 
 module.exports = router;

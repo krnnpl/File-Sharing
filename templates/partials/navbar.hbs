@@ -151,89 +151,139 @@
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
-  <script>
-    // Handle form submission
-    $('#search-form').submit(function (event) {
-      event.preventDefault(); // Prevent the form from submitting normally
-      const query = $('input[name="query"]').val(); // Get the search query
-      if (query) {
-        // Get the access token from the cookie
-        var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
+<script>
+  // Handle form submission
+  $('#search-form').submit(function (event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+    const query = $('input[name="query"]').val(); // Get the search query
+    if (query) {
+      // Get the access token from the cookie
+      var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
 
-        // Send an AJAX request to the search API endpoint
-        $.ajax({
-          url: '/api/search',
-          type: 'GET',
-          data: { query: query },
-          headers: {
-            'Authorization': 'Bearer ' + accessToken
-          },
-          success: function (response) {
-            // Render the search results
-            const resultContainer = document.getElementById('result-container');
-            resultContainer.innerHTML = '';
+      // Send an AJAX request to the search API endpoint
+      $.ajax({
+        url: '/api/search',
+        type: 'GET',
+        data: { query: query },
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        success: function (response) {
+          // Render the search results
+          const resultContainer = document.getElementById('result-container');
+          resultContainer.innerHTML = '';
 
-            if (response.messages.length) {
-              const messagesHeading = document.createElement('h2');
-              messagesHeading.textContent = 'Messages';
-              resultContainer.appendChild(messagesHeading);
+          if (response.users && response.users.length) {
+            const usersHeading = document.createElement('h2');
+            usersHeading.textContent = 'User Search Results';
+            resultContainer.appendChild(usersHeading);
 
-              response.messages.forEach(function (message) {
-                const messageItem = document.createElement('div');
-                messageItem.classList.add('result-item');
+            response.users.forEach(function (user) {
+              const profileCard = document.createElement('div');
+              profileCard.classList.add('card', 'my-3');
+              profileCard.innerHTML = `
+                <div class="card-body">
+                  <h5 class="card-title">${user.username}</h5>
+                  <p class="card-text">Branch: ${user.branch}</p>
+                  <p class="card-text">Full Name: ${user.firstName} ${user.lastName}</p>
+                  
+                </div>
+              `;
 
-                const title = document.createElement('div');
-                title.classList.add('result-title');
-                title.textContent = message.subject;
-                messageItem.appendChild(title);
-
-                const description = document.createElement('div');
-                description.classList.add('result-description');
-                description.textContent = message.body;
-                messageItem.appendChild(description);
-
-                resultContainer.appendChild(messageItem);
-              });
-            } else {
-              const noMessages = document.createElement('p');
-              noMessages.textContent = 'No messages found.';
-              resultContainer.appendChild(noMessages);
-            }
-
-            if (response.users.length) {
-              const usersHeading = document.createElement('h2');
-              usersHeading.textContent = 'Users';
-              resultContainer.appendChild(usersHeading);
-
-              response.users.forEach(function (user) {
-                const userItem = document.createElement('div');
-                userItem.classList.add('result-item');
-
-                const username = document.createElement('div');
-                username.classList.add('result-title');
-                username.textContent = user.username;
-                userItem.appendChild(username);
-
-                const branch = document.createElement('div');
-                branch.classList.add('result-description');
-                branch.textContent = 'Branch: ' + user.branch;
-                userItem.appendChild(branch);
-
-                resultContainer.appendChild(userItem);
-              });
-            } else {
-              const noUsers = document.createElement('p');
-              noUsers.textContent = 'No users found.';
-              resultContainer.appendChild(noUsers);
-            }
-          },
-          error: function (error) {
-            console.error(error);
+              resultContainer.appendChild(profileCard);
+            });
+          } else {
+            const noUserResults = document.createElement('p');
+            noUserResults.textContent = 'No users found.';
+            resultContainer.appendChild(noUserResults);
           }
-        });
-      }
-    });
-  </script>
+
+          // Render inbox search results
+          if (response.inboxSearch && response.inboxSearch.length) {
+            const inboxHeading = document.createElement('h2');
+            inboxHeading.textContent = 'Inbox Search Results';
+            resultContainer.appendChild(inboxHeading);
+
+            const inboxTable = document.createElement('table');
+            inboxTable.classList.add('table', 'table-striped');
+            const inboxTableBody = document.createElement('tbody');
+
+            response.inboxSearch.forEach(function (message) {
+              const row = document.createElement('tr');
+              const receivers = message.receivers.join(', ');
+              const attachments = getAttachmentDetails(message.attachments);
+
+              row.innerHTML = `
+                <td>${new Date(message.createdAt).toLocaleString()}</td>
+                <td>${message.sender}</td>
+                <td>${receivers}</td>
+                <td>${message.subject}</td>
+                <td>${attachments}</td>
+              `;
+
+              row.addEventListener('click', () => {
+                openMessageWindow(message);
+              });
+
+              inboxTableBody.appendChild(row);
+            });
+
+            inboxTable.appendChild(inboxTableBody);
+            resultContainer.appendChild(inboxTable);
+          } else {
+            const noInboxMessages = document.createElement('p');
+            noInboxMessages.textContent = 'No inbox messages found.';
+            resultContainer.appendChild(noInboxMessages);
+          }
+
+          // Render outbox search results
+          if (response.outboxSearch && response.outboxSearch.length) {
+            const outboxHeading = document.createElement('h2');
+            outboxHeading.textContent = 'Outbox Search Results';
+            resultContainer.appendChild(outboxHeading);
+
+            const outboxTable = document.createElement('table');
+            outboxTable.classList.add('table', 'table-striped');
+            const outboxTableBody = document.createElement('tbody');
+
+            response.outboxSearch.forEach(function (message) {
+              const row = document.createElement('tr');
+              const receivers = message.receivers.join(', ');
+              const attachments = getAttachmentDetails(message.attachments);
+
+              row.innerHTML = `
+                <td>${new Date(message.createdAt).toLocaleString()}</td>
+                <td>${message.sender}</td>
+                <td>${receivers}</td>
+                <td>${message.subject}</td>
+                <td>${attachments}</td>
+              `;
+
+              row.addEventListener('click', () => {
+                openMessageWindow(message);
+              });
+
+              outboxTableBody.appendChild(row);
+            });
+
+            outboxTable.appendChild(outboxTableBody);
+            resultContainer.appendChild(outboxTable);
+          } else {
+            const noOutboxMessages = document.createElement('p');
+            noOutboxMessages.textContent = 'No outbox messages found.';
+            resultContainer.appendChild(noOutboxMessages);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        }
+      });
+    }
+  });
+</script>
+
+
+
 </body>
 
 </html>

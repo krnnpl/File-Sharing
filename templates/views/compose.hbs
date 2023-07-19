@@ -93,6 +93,7 @@
               <textarea id="message" name="body" required>{{body}}</textarea>
               <label for="files">Files:</label>
               <input type="file" id="files" name="attachments" multiple>
+              <ul id="selected-files-list"></ul>
               <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </form>
           </div>
@@ -103,50 +104,79 @@
   <script src="../jq/jquery.js" type="text/javascript"></script>
   <script src="../js/bootstrap.js" type="text/javascript"></script>
   <script>
-    // Function to handle form submission
-    function submitForm(event) {
-      event.preventDefault();
+ // Store the previously selected files
+let selectedFiles = [];
 
-      const form = event.target;
-      const receivers = form.receivers.value;
-      const subject = form.subject.value;
-      const body = form.body.value;
+// Function to handle file selection
+function handleFileSelect(event) {
+  const filesInput = document.getElementById('files');
+  const newFiles = Array.from(filesInput.files);
 
-      const formData = new FormData();
-      formData.append('receivers', receivers);
-      formData.append('subject', subject);
-      formData.append('body', body);
+  // Combine previously selected files and newly selected files
+  selectedFiles = selectedFiles.concat(newFiles);
 
-      const filesInput = document.getElementById('files');
-      const files = filesInput.files;
-      for (let i = 0; i < files.length; i++) {
-        formData.append('attachments', files[i]);
+  // Display all selected files
+  const selectedFilesList = document.getElementById('selected-files-list');
+  selectedFilesList.innerHTML = '';
+  selectedFiles.forEach(file => {
+    const listItem = document.createElement('li');
+    listItem.textContent = file.name;
+    selectedFilesList.appendChild(listItem);
+  });
+}
+
+// Attach event listener to the file input's change event
+const filesInput = document.getElementById('files');
+filesInput.addEventListener('change', handleFileSelect);
+
+// Function to handle form submission
+function submitForm(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const receivers = form.receivers.value;
+  const subject = form.subject.value;
+  const body = form.body.value;
+
+  const formData = new FormData();
+  formData.append('receivers', receivers);
+  formData.append('subject', subject);
+  formData.append('body', body);
+
+  // Append all selected files
+  selectedFiles.forEach(file => {
+    formData.append('attachments', file);
+  });
+
+  fetch('http://localhost:3000/api/messages/compose', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Message created successfully:', data);
+      if (data.message) {
+        alert('Message sent successfully');
+        form.reset();
+        filesInput.value = ''; // Clear the file input field
+        selectedFiles = []; // Reset the selected files
+        const selectedFilesList = document.getElementById('selected-files-list');
+        selectedFilesList.innerHTML = ''; // Clear the selected files list
+        window.location.href = 'http://localhost:3000/sent';
+      } else {
+        alert('Failed to send message');
       }
+    })
+    .catch(error => {
+      console.error('Failed to create message:', error);
+      alert('Failed to send message');
+    });
+}
 
-      fetch('http://localhost:3000/api/messages/compose', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Message created successfully:', data);
-          if (data.message) {
-            alert('Message sent successfully');
-            form.reset();
-            window.location.href = 'http://localhost:3000/sent';
-          } else {
-            alert('Failed to send message');
-          }
-        })
-        .catch(error => {
-          console.error('Failed to create message:', error);
-          alert('Failed to send message');
-        });
-    }
+// Attach event listener to the form's submit event
+const form = document.getElementById('compose-form');
+form.addEventListener('submit', submitForm);
 
-    // Attach event listener to the form's submit event
-    const form = document.getElementById('compose-form');
-    form.addEventListener('submit', submitForm);
   </script>
 </body>
 
