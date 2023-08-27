@@ -4,6 +4,7 @@ const app= express();
 const path = require('path');
 const hbs = require("hbs");
 const { registerPartials } =require("hbs");
+const { authenticateForAdminURL } = require('./middleware/auth');
 
 const templatepath =path.join(__dirname,"../templates/views/admin");
 const partialpath = path.join(__dirname, "../templates/partials");
@@ -27,16 +28,16 @@ router.get('/', (req, res) => {
 
 
 
-router.get('/inbox', (req, res) => {
+router.get('/inbox',authenticateForAdminURL, (req, res) => {
   
   res.render('admin/inbox');
 });
 
-router.get('/users', (req, res) => {
+router.get('/users',authenticateForAdminURL, (req, res) => {
   
   res.render('admin/users');
 });
-router.get('/register', (req, res) => {
+router.get('/register',authenticateForAdminURL, (req, res) => {
   
   res.render('admin/register');
 });

@@ -72,6 +72,59 @@ const isAdmin = (req, res, next) => {
   }
 };
 
+// Middleware function to authenticate specific routes and redirect unauthorized users to the login page
+const authenticateForURL = (req, res, next) => {
+  try {
+    const accessToken = req.session.accessToken || req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.redirect('/');
+    }
+
+    const decoded = jwt.verify(accessToken, secretKey);
+
+    User.findById(decoded.userId)
+      .then((user) => {
+        if (!user) {
+          return res.redirect('/');
+        }
+
+        req.user = user;
+        next();
+      });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/');
+  }
+};
 
 
-module.exports = { authenticate,authenticateUser, isAdmin};
+// Middleware function to authenticate specific routes and redirect unauthorized users to the login page
+const authenticateForAdminURL = (req, res, next) => {
+  try {
+    const accessToken = req.session.accessToken || req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.redirect('/admin');
+    }
+
+    const decoded = jwt.verify(accessToken, secretKey);
+
+    User.findById(decoded.userId)
+      .then((user) => {
+        if (!user.isAdmin) {
+          return res.redirect('/admin');
+        }
+
+        req.user = user;
+        next();
+      });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
+};
+
+
+
+module.exports = { authenticate, authenticateForURL,authenticateForAdminURL, authenticateUser, isAdmin };

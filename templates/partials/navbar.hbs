@@ -103,6 +103,7 @@
     color: brown; /* Change the font color to brown */
     font-weight: bold; /* Make the font bold */
     }
+    
   </style>
 </head>
 
@@ -140,20 +141,28 @@
                 </ul>
               </li>
             </ul>
-            <div class="search-container">
-              <form action="/action">
-                <input type="text" placeholder="Search.." name="search">
+           <div class="search-container">
+              <form id="search-form">
+                <input type="text" placeholder="Search.." name="query">
                 <button type="submit"><i class="fa fa-search"></i></button>
               </form>
             </div>
           </div>
         </nav>
+        
       </div>
+      
     </div>
   </div>
-
+   <div class="col-md-10 col-12 mx-auto">
+  <div id="result-container" class = "container1"></div>
+  </div>
+ 
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
-  <script src="../jq/jquery.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
+
+  
   <script>
   // Function to fetch the user's data and update the username placeholder
   function updateUsernamePlaceholder() {
@@ -187,7 +196,152 @@
 
   // Call the function to update the username placeholder when the page loads
   updateUsernamePlaceholder();
+
 </script>
+<script>
+  // Handle form submission
+  $('#search-form').submit(function (event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+    const query = $('input[name="query"]').val(); // Get the search query
+    if (query) {
+      // Get the access token from the cookie
+      var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
+
+      // Send an AJAX request to the search API endpoint
+      $.ajax({
+        url: '/api/search',
+        type: 'GET',
+        data: { query: query },
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        success: function (response) {
+          // Render the search results
+          const resultContainer = document.getElementById('result-container');
+          resultContainer.innerHTML = '';
+
+          if (response.users && response.users.length) {
+            const usersHeading = document.createElement('h2');
+            usersHeading.textContent = 'User Search Results';
+            resultContainer.appendChild(usersHeading);
+
+            response.users.forEach(function (user) {
+              const profileCard = document.createElement('div');
+              profileCard.classList.add('card', 'my-3');
+              profileCard.innerHTML = `
+                <div class="card-body">
+                  <h5 class="card-title">${user.username}</h5>
+                  <p class="card-text">Branch: ${user.branch}</p>
+                  <p class="card-text">Full Name: ${user.firstName} ${user.lastName}</p>
+                  
+                </div>
+              `;
+
+              resultContainer.appendChild(profileCard);
+            });
+          } else {
+            const noUserResults = document.createElement('p');
+            noUserResults.textContent = 'No users found.';
+            resultContainer.appendChild(noUserResults);
+          }
+
+          // Render inbox search results
+          if (response.inboxSearch && response.inboxSearch.length) {
+            const inboxHeading = document.createElement('h2');
+            inboxHeading.textContent = 'Inbox Search Results';
+            resultContainer.appendChild(inboxHeading);
+
+            const inboxTable = document.createElement('table');
+            inboxTable.classList.add('table', 'table-striped');
+            const inboxTableBody = document.createElement('tbody');
+
+            response.inboxSearch.forEach(function (message) {
+              const row = document.createElement('tr');
+              const receivers = message.receivers.join(', ');
+              const attachments = getAttachmentDetails(message.attachments);
+
+              row.innerHTML = `
+                <td>${new Date(message.createdAt).toLocaleString()}</td>
+                <td>${message.sender}</td>
+                <td>${receivers}</td>
+                <td>${message.subject}</td>
+                <td>${attachments}</td>
+              `;
+
+              row.addEventListener('click', () => {
+                openMessageWindow(message);
+              });
+
+              inboxTableBody.appendChild(row);
+            });
+
+            inboxTable.appendChild(inboxTableBody);
+            resultContainer.appendChild(inboxTable);
+          } else {
+            const noInboxMessages = document.createElement('p');
+            noInboxMessages.textContent = 'No inbox messages found.';
+            resultContainer.appendChild(noInboxMessages);
+          }
+
+          // Render outbox search results
+          if (response.outboxSearch && response.outboxSearch.length) {
+            const outboxHeading = document.createElement('h2');
+            outboxHeading.textContent = 'Outbox Search Results';
+            resultContainer.appendChild(outboxHeading);
+
+            const outboxTable = document.createElement('table');
+            outboxTable.classList.add('table', 'table-striped');
+            const outboxTableBody = document.createElement('tbody');
+
+            response.outboxSearch.forEach(function (message) {
+              const row = document.createElement('tr');
+              const receivers = message.receivers.join(', ');
+              const attachments = getAttachmentDetails(message.attachments);
+
+              row.innerHTML = `
+                <td>${new Date(message.createdAt).toLocaleString()}</td>
+                <td>${message.sender}</td>
+                <td>${receivers}</td>
+                <td>${message.subject}</td>
+                <td>${attachments}</td>
+              `;
+
+              row.addEventListener('click', () => {
+                openMessageWindow(message);
+              });
+
+              outboxTableBody.appendChild(row);
+            });
+
+            outboxTable.appendChild(outboxTableBody);
+            resultContainer.appendChild(outboxTable);
+          } else {
+            const noOutboxMessages = document.createElement('p');
+            noOutboxMessages.textContent = 'No outbox messages found.';
+            resultContainer.appendChild(noOutboxMessages);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        }
+      });
+    }
+
+  });
+  // Add event listener to the search input field
+  const searchInput = document.querySelector('input[name="query"]');
+  searchInput.addEventListener('input', function () {
+    const query = this.value.trim(); // Trim any leading/trailing spaces from the query
+
+    // If the query is empty, clear the result container
+    if (query === '') {
+      const resultContainer = document.getElementById('result-container');
+      resultContainer.innerHTML = '';
+    }
+  });
+</script>
+
+
 
 </body>
 

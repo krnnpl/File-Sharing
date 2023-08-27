@@ -135,6 +135,8 @@
           <option value="Ramdhuni">Ramdhuni Branch </option>
           <option value="Bahrachhetra">Bahrachhetra Branch </option>
           <option value="Mahendranagar">Mahendranagar Branch </option>
+          <option value="Balgram MB">Balgram MB </option>
+          
         </select>
       </div>
       <div class="form-group">
@@ -194,7 +196,7 @@
 
     // Send AJAX request
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:3000/api/auth/register");
+    xhr.open("POST", "/api/auth/register");
     // Get the access token from the cookie
     var accessToken = document.cookie.replace(/(?:(?:^|.*;\s*)accessToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
 

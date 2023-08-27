@@ -262,7 +262,7 @@
 
         // Make API request to authenticate admin
         try {
-          const response = await fetch('http://localhost:3000/api/auth/signin', {
+          const response = await fetch('/api/auth/signin', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -275,7 +275,7 @@
           if (response.status === 200) {
             // Admin authenticated successfully
             // Save access token in cookies
-            document.cookie = `accessToken=${data.accessToken}; path=/`;
+           
 
             // Redirect to user homepage
             window.location.href = '/inbox';

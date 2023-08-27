@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Compose Message</title>
   <link rel="stylesheet" href="../css/bootstrap.min.css">
@@ -47,37 +46,35 @@
       resize: none;
     }
 
-    /* Flex container for the "Add Files" and "Send" buttons */
     .button-container {
       display: flex;
       align-items: center;
     }
 
     .file-input-container {
-    flex-grow: 1;
-    max-height: 100px;
-    overflow-y: auto;
-    
-  }
+      flex-grow: 1;
+      max-height: 100px;
+      overflow-y: auto;
+    }
 
     .file-input-container label {
       cursor: pointer;
-      background-color: #007bff; /* Customize the background color */
-      color: #ffffff; /* Customize the text color */
-      padding: 8px 12px; /* Adjust the padding for a more compact button */
-      border-radius: 5px; /* Add border-radius to create rounded corners */
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 5px;
       transition: background-color 0.3s ease;
       display: flex;
-      align-items: center; /* Center the content vertically */
+      align-items: center;
       width: 125px;
     }
 
     .file-input-container label i {
-      margin-right: 5px; /* Add some spacing between the icon and the text */
+      margin-right: 5px;
     }
 
     .file-input-container label:hover {
-      background-color: #0056b3; /* Change the background color on hover */
+      background-color: #0056b3;
     }
 
     .file-input-container input[type="file"] {
@@ -97,7 +94,7 @@
     }
 
     .submit-button {
-      margin-left: 10px; /* Add some spacing between the "Add Files" and "Send" buttons */
+      margin-left: 10px;
       background-color: #4caf50;
       color: #ffffff;
       border: none;
@@ -113,6 +110,12 @@
 
     .submit-button:hover {
       background-color: #45a049;
+    }
+
+    .remove-icon {
+      cursor: pointer;
+      color: #ff0000;
+      margin-left: 10px;
     }
 
     .h1,
@@ -135,7 +138,6 @@
         <textarea id="message" name="body" required>{{body}}</textarea>
         <label for="files">Files:</label>
         <div class="button-container">
-          <!-- Custom icon for file input -->
           <div class="file-input-container">
             <label for="file-input" style="cursor: pointer;">
               <i class="fas fa-upload"></i> Add Files
@@ -154,22 +156,42 @@
     // Store the previously selected files
     let selectedFiles = [];
 
+    // Function to handle file removal
+    function removeFile(index) {
+      selectedFiles.splice(index, 1); // Remove the file from the selectedFiles array
+      displaySelectedFiles(); // Update the displayed list of selected files
+    }
+
+    // Function to display all selected files
+    function displaySelectedFiles() {
+      const selectedFilesList = document.getElementById('selected-files-list');
+      selectedFilesList.innerHTML = '';
+
+      selectedFiles.forEach((file, index) => {
+        const listItem = document.createElement('li');
+        const removeIcon = document.createElement('i');
+        removeIcon.classList.add('fas', 'fa-trash-alt', 'remove-icon');
+        removeIcon.setAttribute('data-index', index);
+
+        // Add event listener to the remove icon
+        removeIcon.addEventListener('click', (event) => {
+          const index = event.target.getAttribute('data-index');
+          removeFile(index);
+        });
+
+        listItem.textContent = file.name;
+        listItem.appendChild(removeIcon);
+        selectedFilesList.appendChild(listItem);
+      });
+    }
+
     // Function to handle file selection
     function handleFileSelect(event) {
       const filesInput = document.getElementById('file-input');
       const newFiles = Array.from(filesInput.files);
 
-      // Combine previously selected files and newly selected files
       selectedFiles = selectedFiles.concat(newFiles);
-
-      // Display all selected files
-      const selectedFilesList = document.getElementById('selected-files-list');
-      selectedFilesList.innerHTML = '';
-      selectedFiles.forEach(file => {
-        const listItem = document.createElement('li');
-        listItem.textContent = file.name;
-        selectedFilesList.appendChild(listItem);
-      });
+      displaySelectedFiles();
     }
 
     // Attach event listener to the file input's change event
@@ -190,12 +212,11 @@
       formData.append('subject', subject);
       formData.append('body', body);
 
-      // Append all selected files
       selectedFiles.forEach(file => {
         formData.append('attachments', file);
       });
 
-      fetch('http://localhost:3000/api/messages/compose', {
+      fetch('/api/messages/compose', {
           method: 'POST',
           body: formData
         })
@@ -205,10 +226,10 @@
           if (data.message) {
             alert('Message sent successfully');
             form.reset();
-            selectedFiles = []; // Reset the selected files
+            selectedFiles = [];
             const selectedFilesList = document.getElementById('selected-files-list');
-            selectedFilesList.innerHTML = ''; // Clear the selected files
-            window.location.href = 'http://localhost:3000/sent';
+            selectedFilesList.innerHTML = '';
+            window.location.href = '/sent';
           } else {
             alert('Failed to send message');
           }
@@ -224,5 +245,4 @@
     form.addEventListener('submit', submitForm);
   </script>
 </body>
-
 </html>

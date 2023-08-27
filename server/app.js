@@ -12,6 +12,8 @@ const router = express.Router();
 const authRoutes = require('./routers/auth');
 const messageRoutes = require('./routers/message');
 const searchRoutes = require('./routers/search');
+const { authenticateForURL } = require('./middleware/auth');
+
 
 
 dotenv.config({ path: './config.env' });
@@ -78,26 +80,26 @@ app.get('/', (req, res) => {
 res.render("login");
 });
 
-app.get('/inbox', (req, res) => {
+app.get('/inbox', authenticateForURL, (req, res) => {
     res.render("inbox");
     });
 
+ 
 
 
-
-    app.get('/compose', (req, res) => {
+    app.get('/compose', authenticateForURL, (req, res) => {
         res.render("compose");
 
     });
 
-    app.get('/sent', (req, res) => {
+    app.get('/sent', authenticateForURL, (req, res) => {
         res.render("sent");
 
     });
-    app.get('/profile', (req, res) => {
+    app.get('/profile', authenticateForURL, (req, res) => {
         res.render("profile");
     });
-    app.get('/logout', (req, res) => {
+    app.get('/logout',  authenticateForURL,(req, res) => {
         // Clear the access token from the session or cookie
         req.session.accessToken = null; // If using session
         res.clearCookie('accessToken'); // If using cookie, replace 'accessToken' with the actual name of your cookie
@@ -126,4 +128,10 @@ app.use('/admin', adminRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running at port no ${PORT}`);
-})
+}) 
+
+//const ipAddress = ' 192.168.1.254'; // Replace with the actual IP address of the server machine
+
+//app.listen(PORT, ' 192.168.1.254', () => {
+    //console.log(`Server listening at http:// 192.168.1.254:${PORT}`);
+  //});
